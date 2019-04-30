@@ -1,0 +1,673 @@
+{{ template "head.html" . }}
+
+{{ template "navigation.html" }}
+
+<section class="section" id="recipe">
+  <div class="container">
+    <form action="/recipe/{{ .Recipe.Id }}/save" method="post">
+
+      <div class="columns">
+        <div class="column is-two-thirds">
+          <div class="field is-horizontal">
+            <div class="field-body">
+              <div class="field">
+                <input class="input" type="text" name="name" placeholder="Name" value="{{ .Recipe.Name }}">
+              </div>
+              <div class="field">
+                <input class="input" type="number" name="version" placeholder="Version" value="{{ .Recipe.XML.Version }}">
+              </div>
+              <div class="field">
+                <div class="select is-fullwidth">
+                  <select name="type">
+                    <option value="All grain" {{ if eq .Recipe.XML.Type "All grain" }}selected{{ end }}>
+                      All grain
+                    </option>
+                    <option value="Extract" {{ if eq .Recipe.XML.Type "Extract" }}selected{{ end }}>
+                      Extract
+                    </option>
+                    <option value="Partial mash" {{ if eq .Recipe.XML.Type "Partial mash" }}selected{{ end }}>
+                      Partial Mash
+                    </option>
+                  </select>
+                </div>
+              </div>
+              <div class="field">
+                <div class="select is-fullwidth">
+                  <select name="public">
+                    <option value="false" {{ if not .Recipe.Public }}selected{{ end }}>Private</option>
+                    <option value="true" {{ if .Recipe.Public }}selected{{ end }}>Public</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field is-horizontal">
+            <div class="field-body">
+              <div class="field">
+                <label class="label" for="notes">Notes</label>
+                <div class="control">
+                  <textarea class="textarea" id="notes" name="notes">{{ .Recipe.XML.Notes }}</textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field is-horizontal">
+            <div class="field-body">
+              <div class="field">
+                <label class="label" for="batch-size">Batch size (l)</label>
+                <div class="control">
+                  <input class="input" type="number" step="0.1" id="batch-size" name="batch-size" value="{{ .Recipe.XML.BatchSize }}">
+                </div>
+              </div>
+              <div class="field">
+                <label class="label" for="boil-time">Boil time (m)</label>
+                <div class="control">
+                  <input class="input" type="number" id="boil-time" name="boil-time" value="{{ .Recipe.XML.BoilTime }}">
+                </div>
+              </div>
+              <div class="field">
+                <label class="label" for="efficiency">Efficiency (%)</label>
+                <div class="control">
+                  <input class="input" type="number" id="efficiency" name="efficiency" value="{{ .Recipe.XML.Efficiency }}">
+                </div>
+              </div>
+              <div class="field">
+                <label class="label" for="boil-size">Boil size (l)</label>
+                <div class="control">
+                  <input class="input" type="text" value="{{ .Calc.BoilSize }}" disabled>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field is-horizontal">
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <button class="button is-primary">
+                    Save changes
+                  </button>
+                  <a class="button is-danger" onclick="showModal('delete');">
+                    Delete recipe
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="column">
+          <div class="field is-horizontal">
+            <div class="field-body">
+              <div class="field">
+                <input class="input" type="text" name="style" list="style"
+                  placeholder="Beer style" value="{{ .Recipe.XML.Style.Name }}">
+                <datalist id="style">
+{{ range .Styles }}
+                  <option value="{{ .Name }}">{{ .Name }}</option>
+{{ end }}
+                </datalist>
+              </div>
+            </div>
+          </div>
+
+          <br />
+
+{{ range .Calc.Cursors }}
+          <div class="columns">
+            <div class="column"><strong>{{ .Name }}</strong>:
+{{ if ne .RGB "" }}
+              <span style="color: {{ .RGB }};">⬛</span>
+{{ end }}
+              {{ .Val }} ({{ .Min }}-{{ .Max }})
+            </div>
+            <div class="column">
+              <div class="slider">
+                <div class="slider-cursor" style="margin-left: {{ .Cursor }}%;"></div>
+                <div class="slider-bar"
+                  style="background-color: {{ if .ValOK }}lightgreen{{ else }}orange{{ end }};">
+                </div>
+              </div>
+            </div>
+          </div>
+{{ end }}
+        </div>
+      </div>
+
+      <br />
+
+      <h2 class="subtitle">Ingredients:</h2>
+      <a class="button is-light" onclick="showFermentable();">
+        Add fermentable
+      </a>
+      <a class="button is-light" onclick="showHop();">
+        Add hop
+      </a>
+      <a class="button is-light" onclick="showYeast();">
+        Add yeast
+      </a>
+      <table class="table is-hoverable is-fullwidth">
+        <thead>
+          <tr>
+            <th></th>
+            <th>Name</th>
+            <th>Type / Form</th>
+            <th>Amount</th>
+            <th>Time</th>
+            <th>SRM / % / <abbr title="Attenuation">Att.</abbr></th>
+            <th class="has-text-right-desktop">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+{{ if .Recipe.XML.Fermentables }}
+{{ range $k, $v := .Recipe.XML.Fermentables }}
+          <tr id="fermentable-{{ $k }}" data-id="{{ $k }}" data-name="{{ $v.Name }}" data-type="{{ $v.Type }}"
+              data-amount="{{ $v.Amount }}" data-yield="{{ $v.Yield }}" data-color="{{ $v.Color }}">
+            <td><abbr title="Fermentable">F</abbr></td>
+            <td>{{ $v.Name }}</td>
+            <td>{{ $v.Type }}</td>
+            <td>{{ $v.Amount }}kg</td>
+            <td>-</td>
+            <td>{{ $v.Color }}</td>
+            <td class="has-text-right-desktop">
+              <a class="button is-small" title="Edit" onclick="editFermentable('#fermentable-{{ $k }}')">
+                <span class="icon is-small"><i class="fas fa-edit"></i></span>
+              </a>
+              <a class="button is-small" title="Delete" href="/recipe/{{ $.Recipe.Id }}/del-fermentable/{{ $k }}">
+                <span class="icon is-small"><i class="fas fa-trash"></i></span>
+              </a>
+            </td>
+          </tr>
+{{ end }}
+{{ end }}
+
+{{ if .Recipe.XML.Hops }}
+{{ range $k, $v := .Recipe.XML.Hops }}
+          <tr id="hop-{{ $k }}" data-id="{{ $k }}" data-name="{{ $v.Name }}" data-form="{{ $v.Form }}"
+              data-amount="{{ $v.Amount }}" data-use="{{ $v.Use }}" data-time="{{ $v.Time }}"
+              data-alpha="{{ $v.Alpha }}">
+            <td><abbr title="Hop">H</abbr></td>
+            <td>{{ $v.Name }}</td>
+            <td>{{ $v.Form }}</td>
+            <td>{{ $v.Amount }}kg</td>
+            <td>{{ $v.Use }} - {{ $v.Time }}m</td>
+            <td>{{ $v.Alpha }}</td>
+            <td class="has-text-right-desktop">
+              <a class="button is-small" title="Edit" onclick="editHop('#hop-{{ $k }}')">
+                <span class="icon is-small"><i class="fas fa-edit"></i></span>
+              </a>
+              <a class="button is-small" title="Delete" href="/recipe/{{ $.Recipe.Id }}/del-hop/{{ $k }}">
+                <span class="icon is-small"><i class="fas fa-trash"></i></span>
+              </a>
+            </td>
+          </tr>
+{{ end }}
+{{ end }}
+
+{{ if .Recipe.XML.Yeasts }}
+{{ range $k, $v := .Recipe.XML.Yeasts }}
+          <tr id="yeast-{{ $k }}" data-id="{{ $k }}" data-name="{{ $v.Name }}" data-form="{{ $v.Form }}"
+              data-amount="{{ $v.Amount }}" data-amount-is-weight="{{ $v.AmountIsWeight }}"
+              data-attenuation="{{ $v.Attenuation }}">
+            <td><abbr title="Yeast">Y</abbr></td>
+            <td>{{ $v.Name }}</td>
+            <td>{{ $v.Form }}</td>
+            <td>{{ $v.Amount }}{{ if $v.AmountIsWeight }}kg{{ else }}l{{ end }}</td>
+            <td>-</td>
+            <td>{{ $v.Attenuation }}</td>
+            <td class="has-text-right-desktop">
+              <a class="button is-small" title="Edit" onclick="editYeast('#yeast-{{ $k }}')">
+                <span class="icon is-small"><i class="fas fa-edit"></i></span>
+              </a>
+              <a class="button is-small" title="Delete" href="/recipe/{{ $.Recipe.Id }}/del-yeast/{{ $k }}">
+                <span class="icon is-small"><i class="fas fa-trash"></i></span>
+              </a>
+            </td>
+          </tr>
+{{ end }}
+{{ end }}
+        </tbody>
+      </table>
+
+      <h2 class="subtitle">Mash steps:</h2>
+      <a class="button is-light" onclick="showMashStep();">
+        Add step
+      </a>
+      <table class="table is-hoverable is-fullwidth">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Temperature</th>
+            <th>Time</th>
+            <th class="has-text-right-desktop">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+{{ if .Recipe.XML.Mash }}
+{{ if .Recipe.XML.Mash.MashSteps }}
+{{ range $k, $v := .Recipe.XML.Mash.MashSteps }}
+          <tr id="mash-step-{{ $k }}" data-id="{{ $k }}" data-name="{{ $v.Name }}" data-type="{{ $v.Type }}"
+              data-temp="{{ $v.StepTemp }}" data-time="{{ $v.StepTime }}">
+            <td>{{ $v.Name }}</td>
+            <td>{{ $v.Type }}</td>
+            <td>{{ $v.StepTemp }}°C</td>
+            <td>{{ $v.StepTime }}m</td>
+            <td class="has-text-right-desktop">
+              <a class="button is-small" title="Edit" onclick="editMashStep('#mash-step-{{ $k }}')">
+                <span class="icon is-small"><i class="fas fa-edit"></i></span>
+              </a>
+              <a class="button is-small" title="Delete" href="/recipe/{{ $.Recipe.Id }}/del-mash-step/{{ $k }}">
+                <span class="icon is-small"><i class="fas fa-trash"></i></span>
+              </a>
+            </td>
+          </tr>
+{{ end }}
+{{ end }}
+{{ end }}
+        </tbody>
+      </table>
+    </form>
+  </div>
+</section>
+
+<div class="modal" id="modal-delete">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Delete recipe?</p>
+      <button class="delete" aria-label="close" onclick="hideModal('delete');">
+      </button>
+    </header>
+    <section class="modal-card-body">
+      <p>
+        All the data associated to the recipe
+        "<strong>{{ .Recipe.Name }}</strong>" will be deleted.
+      </p><br />
+      <form action="/recipe/{{ .Recipe.Id }}/delete" method="post">
+        <button class="button is-danger">Yes, delete</button>
+        <a class="button is-light" onclick="hideModal('delete');">
+          No, keep
+        </a>
+      </form>
+    </section>
+  </div>
+</div>
+
+<div class="modal" id="modal-fermentable">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title" id="title"></p>
+      <button class="delete" aria-label="close" onclick="hideModal('fermentable');">
+      </button>
+    </header>
+    <section class="modal-card-body">
+      <form method="post">
+        <div class="field is-horizontal">
+          <div class="field-body">
+            <div class="field">
+              <label class="label" for="name">Name</label>
+              <div class="control">
+                <input class="input" type="text" id="name" name="name">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Type</label>
+              <div class="control">
+                <div class="select is-fullwidth">
+                  <select name="type" id="type">
+                    <option value="Grain">Grain</option>
+                    <option value="Sugar">Sugar</option>
+                    <option value="Extract">Extract</option>
+                    <option value="Dry extract">Dry extract</option>
+                    <option value="Adjunct">Adjunct</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label" for="color">SRM</label>
+              <div class="control">
+                <input class="input" type="number" step="0.01" id="color" name="color">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field is-horizontal">
+          <div class="field-body">
+            <div class="field">
+              <label class="label" for="amount">Amount (kg)</label>
+              <div class="control">
+                <input class="input" type="number" step="0.001" id="amount" name="amount">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label" for="yield">Yield</label>
+              <div class="control">
+                <input class="input" type="number" step="0.01" id="yield" name="yield">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="control">
+            <button class="button is-link" id="button">Add</button>
+          </div>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>
+
+<div class="modal" id="modal-hop">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title" id="title"></p>
+      <button class="delete" aria-label="close" onclick="hideModal('hop');">
+      </button>
+    </header>
+    <section class="modal-card-body">
+      <form method="post">
+        <div class="field is-horizontal">
+          <div class="field-body">
+            <div class="field">
+              <label class="label" for="name">Name</label>
+              <div class="control">
+                <input class="input" type="text" id="name" name="name">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Form</label>
+              <div class="control">
+                <div class="select is-fullwidth">
+                  <select name="form" id="form">
+                    <option value="Pellet">Pellet</option>
+                    <option value="Leaf">Leaf</option>
+                    <option value="Plug">Plug</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label" for="alpha">Alpha (%)</label>
+              <div class="control">
+                <input class="input" type="number" step="0.1" id="alpha" name="alpha">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field is-horizontal">
+          <div class="field-body">
+            <div class="field">
+              <label class="label">Use</label>
+              <div class="control">
+                <div class="select is-fullwidth">
+                  <select name="use" id="use">
+                    <option value="Boil">Boil</option>
+                    <option value="Dry hop">Dry hop</option>
+                    <option value="Mash">Mash</option>
+                    <option value="First wort">First wort</option>
+                    <option value="Aroma">Aroma</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label" for="amount">Amount (kg)</label>
+              <div class="control">
+                <input class="input" type="number" step="0.001" id="amount" name="amount">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label" for="time">Time (m)</label>
+              <div class="control">
+                <input class="input" type="number" id="time" name="time">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="control">
+            <button class="button is-link" id="button"></button>
+          </div>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>
+
+<div class="modal" id="modal-yeast">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title" id="title"></p>
+      <button class="delete" aria-label="close" onclick="hideModal('yeast');">
+      </button>
+    </header>
+    <section class="modal-card-body">
+      <form method="post">
+        <div class="field is-horizontal">
+          <div class="field-body">
+            <div class="field">
+              <label class="label" for="name">Name</label>
+              <div class="control">
+                <input class="input" type="text" id="name" name="name">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Form</label>
+              <div class="control">
+                <div class="select is-fullwidth">
+                  <select name="form" id="form">
+                    <option value="Liquid">Liquid</option>
+                    <option value="Dry">Dry</option>
+                    <option value="Slant">Slant</option>
+                    <option value="Culture">Culture</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label" for="attenuation">Attenuation</label>
+              <div class="control">
+                <input class="input" type="number" step="0.1" id="attenuation" name="attenuation">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field is-horizontal">
+          <div class="field-body">
+            <div class="field">
+              <label class="label" for="amount">Amount</label>
+              <div class="control">
+                <input class="input" type="number" step="0.001" id="amount" name="amount">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Amount unit</label>
+              <div class="control">
+                <div class="select is-fullwidth">
+                  <select name="unit" id="unit">
+                    <option value="kilogram">Kilogram</option>
+                    <option value="litre">Litre</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="control">
+            <button class="button is-link" id="button"></button>
+          </div>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>
+
+<div class="modal" id="modal-mash-step">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title" id="title"></p>
+      <button class="delete" aria-label="close" onclick="hideModal('mash-step');">
+      </button>
+    </header>
+    <section class="modal-card-body">
+      <form method="post">
+        <div class="field is-horizontal">
+          <div class="field-body">
+            <div class="field">
+              <label class="label" for="name">Name</label>
+              <div class="control">
+                <input class="input" type="text" id="name" name="name">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Type</label>
+              <div class="control">
+                <div class="select is-fullwidth">
+                  <select name="type" id="type">
+                    <option value="Temperature">Temperature</option>
+                    <!--<option value="Infusion">Infusion</option>-->
+                    <option value="Decoction">Decoction</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <!--
+            <div class="field">
+              <label class="label" for="infusion_amount">Infuse amount</label>
+              <div class="control">
+                <input class="input" type="number" id="infuse_amount" name="infuse_amount">
+              </div>
+            </div>
+            -->
+          </div>
+        </div>
+        <div class="field is-horizontal">
+          <div class="field-body">
+            <div class="field">
+              <label class="label" for="temperature">Temperature (°C)</label>
+              <div class="control">
+                <input class="input" type="number" id="temperature" name="temperature">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label" for="time">Time (m)</label>
+              <div class="control">
+                <input class="input" type="number" id="time" name="time">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="control">
+            <button class="button is-link" id="button"></button>
+          </div>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>
+
+<script>
+  function showModal(id) {
+    $(`#modal-${id} form`)[0].reset();
+    $(`#modal-${id}`).addClass("is-active");
+  }
+
+  function configureModal(id, title, button, action) {
+    $(`#modal-${id} #title`).text(title);
+    $(`#modal-${id} #button`).text(button);
+    $(`#modal-${id} form`).attr("action", action);
+  }
+
+  function hideModal(id) {
+    $(`#modal-${id}`).removeClass("is-active");
+  }
+
+  function showFermentable() {
+    configureModal("fermentable", "{{ L "Add fermentable" }}", "{{ L "Add" }}",
+                   "/recipe/{{ .Recipe.Id }}/add-fermentable");
+    showModal("fermentable");
+  }
+
+  function showHop() {
+    configureModal("hop", "{{ L "Add hop" }}", "{{ L "Add" }}",
+                   "/recipe/{{ .Recipe.Id }}/add-hop");
+    showModal("hop");
+  }
+
+  function showYeast() {
+    configureModal("yeast", "{{ L "Add yeast" }}", "{{ L "Add" }}",
+                   "/recipe/{{ .Recipe.Id }}/add-yeast");
+    showModal("yeast");
+  }
+
+  function showMashStep() {
+    configureModal("mash-step", "{{ L "Add mash step" }}", "{{ L "Add" }}",
+                   "/recipe/{{ .Recipe.Id }}/add-mash-step");
+    showModal("mash-step");
+  }
+
+  function editFermentable(id) {
+    configureModal("fermentable", "{{ L "Edit fermentable" }}", "{{ L "Save" }}",
+                   "/recipe/{{ .Recipe.Id }}/save-fermentable/" + $(id).data("id"));
+    showModal('fermentable');
+
+    $("#modal-fermentable #name").val($(id).data("name"));
+    $("#modal-fermentable #type").val($(id).data("type"));
+    $("#modal-fermentable #amount").val($(id).data("amount"));
+    $("#modal-fermentable #yield").val($(id).data("yield"));
+    $("#modal-fermentable #color").val($(id).data("color"));
+  }
+
+  function editHop(id) {
+    configureModal("hop", "{{ L "Edit hop" }}", "{{ L "Save" }}",
+                   "/recipe/{{ .Recipe.Id }}/save-hop/" + $(id).data("id"));
+    showModal('hop');
+
+    $("#modal-hop #name").val($(id).data("name"));
+    $("#modal-hop #form").val($(id).data("form"));
+    $("#modal-hop #amount").val($(id).data("amount"));
+    $("#modal-hop #use").val($(id).data("use"));
+    $("#modal-hop #time").val($(id).data("time"));
+    $("#modal-hop #alpha").val($(id).data("alpha"));
+  }
+
+  function editYeast(id) {
+    configureModal("yeast", "{{ L "Edit yeast" }}", "{{ L "Save" }}",
+                   "/recipe/{{ .Recipe.Id }}/save-yeast/" + $(id).data("id"));
+    showModal('yeast')
+
+    $("#modal-yeast #name").val($(id).data("name"));
+    $("#modal-yeast #form").val($(id).data("form"));
+    $("#modal-yeast #amount").val($(id).data("amount"));
+    $("#modal-yeast #attenuation").val($(id).data("attenuation"));
+
+    if ($(id).data("amount-is-weight")) {
+      $("#modal-yeast #unit").val("kilogram");
+    } else {
+      $("#modal-yeast #unit").val("litre");
+    }
+  }
+
+  function editMashStep(id) {
+    configureModal("mash-step", "{{ L "Edit mash step" }}", "{{ L "Save" }}",
+                   "/recipe/{{ .Recipe.Id }}/save-mash-step/" + $(id).data("id"));
+    showModal('mash-step');
+
+    $("#modal-mash-step #name").val($(id).data("name"));
+    $("#modal-mash-step #type").val($(id).data("type"));
+    $("#modal-mash-step #temperature").val($(id).data("temp"));
+    $("#modal-mash-step #time").val($(id).data("time"));
+  }
+</script>
+
+{{ template "foot.html" }}

@@ -1,0 +1,36 @@
+{{ template "head.html" }}
+
+{{ template "navigation.html" }}
+
+<section class="section">
+  <div class="container">
+    <!-- TODO: display current brews -->
+
+    <h1 class="title is-4">{{ L "Recipes" }}:</h1>
+    <a href="/recipe/new" class="button is-light">{{ L "New recipe" }}</a>
+    <table class="table is-hoverable is-fullwidth">
+      <thead>
+        <tr>
+          <th>{{ L "Name" }}</th>
+          <th>{{ L "Style" }}</th>
+          <th>{{ L "Version" }}</th>
+          <th>{{ L "Visibility" }}</th>
+        </tr>
+      </thead>
+      <tbody>
+{{ if .Recipes }}
+{{ range .Recipes }}
+        <tr>
+          <td><a href="/recipe/{{ .Id }}">{{ .Name }}</a></td>
+          <td>{{ .XML.Style.Name }}</td>
+          <td>{{ .XML.Version }}</td>
+          <td>{{ if .Public }}{{ L "Public" }}{{ else }}-{{ end }}</td>
+        </tr>
+{{ end }}
+{{ end }}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{{ template "foot.html" }}

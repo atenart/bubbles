@@ -1,0 +1,52 @@
+{{ template "head.html" }}
+
+<div id="login">
+  <div class="container">
+    <h1 class="title is-1">Bubbles</h1>
+    <p class="subtitle">
+      Helps you create beer recipes and makes your life easier in the
+      (home)brewing process; and can import/export BeerXML files for easier
+      migration. Powered by free and open-source software.
+    </p>
+    <form action="/login" method="post">
+      <div class="field">
+        <div class="control has-icons-left">
+          <input class="input" type="text" name="email" placeholder="E-mail" autofocus>
+          <span class="icon is-small is-left"><i class="fas fa-user"></i></span>
+        </div>
+      </div>
+      <div class="field">
+        <div class="control has-icons-left">
+          <input class="input" type="password" name="password" placeholder="Password">
+          <span class="icon is-small is-left"><i class="fas fa-lock"></i></span>
+        </div>
+      </div>
+      <div class="field is-grouped is-grouped-centered">
+        <div class="control">
+          <button class="button is-link">Sign in</button>
+        </div>
+{{ if .SignUp }}
+        <div class="control">
+          <button class="button is-text" formaction="/sign-up">Sign up</button>
+        </div>
+{{ end }}
+      </div>
+    </form>
+  </div>
+
+<footer id="login-footer">
+  <p>
+    <a href="https://github.com/atenart/bubbles/">Bubbles</a>
+    (<a href="https://github.com/atenart/bubbles/blob/master/LICENSE">GPLv3</a>)
+    -
+    Made with ♥
+    <br />
+    Background image by <a href="https://en.wikipedia.org/wiki/User:Winonave">Winonave</a>
+    (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA 3.0</a>)
+  </p>
+</footer>
+
+</div>
+</div>
+</body>
+</html>

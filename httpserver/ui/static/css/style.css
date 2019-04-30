@@ -1,0 +1,105 @@
+html, body {
+  height: 100%;
+  overflow: auto;
+}
+#content {
+  min-height: 100%;
+  padding-bottom: 3.5rem;
+}
+footer {
+  margin-top: -3.5rem;
+  width: 100%;
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.8rem;
+}
+footer a {
+  text-decoration: underline;
+  color: inherit;
+}
+footer a:hover {
+  color: black;
+}
+.navbar {
+  background-color: hsl(0, 0%, 96%);
+}
+
+/* Sliders
+ */
+.slider {
+  width: 100%;
+  margin-top: 0.6rem;
+}
+.slider-bar {
+  height: 5px;
+  background-color: lightgreen;
+  z-index: 100;
+}
+.slider-cursor {
+  float: left;
+  height: 8px;
+  width: 2px;
+  margin-top: -3px; /* cursor height - bar height */
+  background-color: black;
+  z-index: 110;
+}
+
+/* Recipe
+ */
+#recipe .columns:not(:last-child) {
+  margin-bottom: 0;
+}
+
+/* Login screen
+ */
+#login {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-image: url('/static/img/login_background.jpg');
+  background-size: cover;
+  background-position: center center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+#login .title, #login .subtitle, #login p, #login a, #login a:hover, #login .button.is-text {
+  color: white;
+  text-shadow: black 0.1rem 0.1rem 0.2rem;
+}
+#login .container {
+  width: 90%;
+  max-width: 500px;
+  background: inherit;
+}
+#login .subtitle {
+  text-align: justify;
+}
+#login a {
+  text-decoration: underline;
+}
+#login form {
+  max-width: 250px;
+  margin: auto;
+}
+#login .button.is-text:focus, #login .button.is-text:hover {
+  background-color: inherit;
+  color: white;
+}
+#login footer {
+  color: white;
+}
+#login footer a {
+  text-decoration: underline;
+  color: white;
+}
+#login footer a:hover {
+  color: white;
+}
+#login-footer {
+  position: absolute;
+  bottom: 0;
+}
