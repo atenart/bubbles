@@ -388,6 +388,12 @@ func (s *Server) saveRecipe(w http.ResponseWriter, r *http.Request, user *db.Use
 		http.Error(w, fmt.Sprintf("Unknown action '%s'", action), 500)
 	}
 
+	// Sort elements.
+	sort(recipe.XML.Fermentables)
+	sort(recipe.XML.Hops)
+	sort(recipe.XML.Yeasts)
+	sort(recipe.XML.Mash.MashSteps)
+
 	// Update recipe.
 	id, err = s.db.UpdateRecipe(recipe)
 	if err != nil {
