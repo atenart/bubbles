@@ -124,7 +124,7 @@ func (r *Recipe) CalcIBU() float64 {
 
 	var sum float64
 	for _, h := range r.Hops {
-		if h.Use == "Dry Hop" || h.Use == "Aroma" {
+		if h.Use == "Dry hop" || h.Use == "Aroma" {
 			continue
 		}
 
