@@ -178,7 +178,7 @@ func calculations(r *db.Recipe) *Calculation {
 				math.Round(ibuRe * 100) / 100,
 				0,
 				15,
-				cursor(ibuOg, 0, 15),
+				cursor(ibuRe, 0, 15),
 				true,
 				"",
 			},
