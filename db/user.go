@@ -37,7 +37,8 @@ func (db *DB) HashPassword(password string) (string, error) {
 func (db *DB) GetUserByEmail(email string) (*User, error) {
 	var u User
 	err := db.QueryRow("SELECT * FROM users WHERE email == $1", email).
-		Scan(&u.Id, &u.Email, &u.Password, &u.Token, &u.Enabled, &u.Lang)
+		Scan(&u.Id, &u.Email, &u.Password, &u.RegistrationDate, &u.Token,
+		     &u.Enabled, &u.Lang)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +49,8 @@ func (db *DB) GetUserByEmail(email string) (*User, error) {
 func (db *DB) GetUserById(uid int64) (*User, error) {
 	var u User
 	err := db.QueryRow("SELECT * FROM users WHERE id == $1", uid).
-		Scan(&u.Id, &u.Email, &u.Password, &u.Token, &u.Enabled, &u.Lang)
+		Scan(&u.Id, &u.Email, &u.Password, &u.RegistrationDate, &u.Token,
+		     &u.Enabled, &u.Lang)
 	if err != nil {
 		return nil, err
 	}

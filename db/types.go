@@ -19,12 +19,13 @@ import "github.com/atenart/bubbles/beerxml"
 
 // Represents an user.
 type User struct {
-	Id       int64
-	Email    string
-	Password string
-	Token    string
-	Enabled  bool
-	Lang     string
+	Id               int64
+	Email            string
+	Password         string
+	RegistrationDate string
+	Token            string
+	Enabled          bool
+	Lang             string
 }
 
 // Represents a recipe and contains a path to its associated BeerXML file.
