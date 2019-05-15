@@ -577,19 +577,10 @@
 </div>
 
 <script>
-  function showModal(id) {
-    $(`#modal-${id} form`)[0].reset();
-    $(`#modal-${id}`).addClass("is-active");
-  }
-
   function configureModal(id, title, button, action) {
     $(`#modal-${id} #title`).text(title);
     $(`#modal-${id} #button`).text(button);
     $(`#modal-${id} form`).attr("action", action);
-  }
-
-  function hideModal(id) {
-    $(`#modal-${id}`).removeClass("is-active");
   }
 
   function showFermentable() {
