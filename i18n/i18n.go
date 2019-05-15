@@ -63,6 +63,15 @@ func Init() (*Bundle, error) {
 	return &Bundle{ bundle }, err
 }
 
+// Get the language tags loaded.
+func (b *Bundle) Tags() []string {
+	var tags []string
+	for _, t := range b.LanguageTags() {
+	      tags = append(tags, t.String())
+	}
+	return tags
+}
+
 // Returns a new localizer.
 func (b *Bundle) Localizer(langs ...string) *Localizer {
 	return &Localizer{ i18n.NewLocalizer(b.Bundle, langs...) }

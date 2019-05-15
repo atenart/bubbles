@@ -71,3 +71,11 @@ func (db *DB) ActivateUser(token string) error {
 	_, err := db.Exec("UPDATE users SET enabled = 1 WHERE token == ?", token)
 	return err
 }
+
+// Update an user info.
+func (db *DB) UpdateUser(u *User) error {
+	_, err := db.Exec(`
+REPLACE INTO users (id, email, password, token, enabled, lang)
+VALUES (?, ?, ?, ?, ?, ?)`, u.Id, u.Email, u.Password, u.Token, u.Enabled, u.Lang)
+	return err
+}

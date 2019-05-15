@@ -1,0 +1,117 @@
+{{ template "head.html" . }}
+
+{{ template "navigation.html" }}
+
+<section class="section">
+  <div class="container">
+    <h1 class="title is-4">{{ L "Modify account" }}</h1>
+    <form action="/account/save" method="post">
+
+      <div class="field is-horizontal">
+        <div class="field-body">
+          <div class="field">
+            <label class="label"i for="email">{{ L "E-mail" }}</label>
+            <div class="control">
+              <input class="input" type="text" id="email" value="{{ .User.Email }}" disabled>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label" for="lang">{{ L "Lang." }}</label>
+            <div class="control">
+              <div class="select is-fullwidth">
+                <select name="lang" id="lang">
+{{ range .Tags }}
+                  <option value="{{ . }}" {{ if eq . $.User.Lang }}selected{{ end }}>{{ . }}</option>
+{{ end }}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-body">
+          <div class="field">
+            <label class="label"i for="current-password">{{ L "Current password" }}</label>
+            <div class="control">
+              <input class="input" type="password" id="current-password" name="current-password">
+            </div>
+          </div>
+          <div class="field">
+            <label class="label"i for="new-password">{{ L "New password" }}</label>
+            <div class="control">
+              <input class="input" type="password" id="new-password" name="new-password">
+            </div>
+          </div>
+          <div class="field">
+            <label class="label"i for="confirm-password">{{ L "Confirm new password" }}</label>
+            <div class="control">
+              <input class="input" type="password" id="confirm-password" name="confirm-password">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="field is-horizontal">
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <button class="button is-primary">
+                {{ L "Save changes" }}
+              </button>
+              <a class="button is-danger" onclick="showModal('delete');">
+                {{ L "Delete account" }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</section>
+
+<div class="modal" id="modal-delete">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Delete account?</p>
+      <button class="delete" aria-label="close" onclick="hideModal('delete');">
+      </button>
+    </header>
+    <section class="modal-card-body">
+      <p>
+        All the data associated to the account "<strong>{{ .User.Email }}</strong>"
+        will be permanently deleted. This includes all your recipes.
+      </p><br />
+      <form action="/account/delete" method="post">
+        <button class="button is-danger">Yes, delete</button>
+        <a class="button is-light" onclick="hideModal('delete');">
+          Cancel
+        </a>
+      </form>
+    </section>
+  </div>
+</div>
+
+<section class="section">
+  <div class="container">
+    <h1 class="title is-4">{{ L "Data usage and privacy" }}</h1>
+    <p>
+      We do not track you, there are no external resource loaded from our pages
+      (i.e. no tracking from Google, Facebook or anyone) and we do not sell or
+      share anything to anyone. We do not display statistics. For the purpose of
+      running this service, we do host your account information (e-mail,
+      password) and data (recipes). You can remove them at any time individually
+      or by removing your entire account.
+      <br /><br />
+      <strong>Bubbles</strong> is a
+      <a href="https://en.wikipedia.org/wiki/Free_software">free software</a>:
+      you can run it on your own instance, study it by reading its source code,
+      redistribute it and improve it.
+    </p>
+  </div>
+</section>
+
+{{ template "foot.html" }}
