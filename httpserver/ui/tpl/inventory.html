@@ -21,7 +21,7 @@
           <th>{{ L "Name" }}</th>
           <th>{{ L "Type / Form" }}</th>
           <th>{{ L "Amount" }}</th>
-          <th>Actions</th>
+          <th class="has-text-right-desktop">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -35,7 +35,7 @@
           <td>{{ .XML.Name }}</td>
           <td>{{ .XML.Type }}</td>
           <td>{{ .XML.Amount }}kg</td>
-          <td>
+          <td class="has-text-right-desktop">
             <a class="button is-small" title="Edit" onclick="editFermentable('/inventory' ,'#fermentable-{{ .Id }}')">
               <span class="icon is-small"><i class="fas fa-edit"></i></span>
             </a>
@@ -52,7 +52,7 @@
           <td>{{ .XML.Name }}</td>
           <td>{{ .XML.Form }}</td>
           <td>{{ .XML.Amount }}kg</td>
-          <td>
+          <td class="has-text-right-desktop">
             <a class="button is-small" title="Edit" onclick="editHop('/inventory' ,'#hop-{{ .Id }}')">
               <span class="icon is-small"><i class="fas fa-edit"></i></span>
             </a>
@@ -69,7 +69,7 @@
           <td>{{ .XML.Name }}</td>
           <td>{{ .XML.Form }}</td>
           <td>{{ .XML.Amount }}{{ if .XML.AmountIsWeight }}kg{{ else }}l{{ end }}</td>
-          <td>
+          <td class="has-text-right-desktop">
             <a class="button is-small" title="Edit" onclick="editYeast('/inventory' ,'#yeast-{{ .Id }}')">
               <span class="icon is-small"><i class="fas fa-edit"></i></span>
             </a>
