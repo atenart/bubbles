@@ -139,13 +139,13 @@
       <br />
 
       <h2 class="subtitle">Ingredients:</h2>
-      <a class="button is-light" onclick="showFermentable();">
+      <a class="button is-light" onclick="showFermentable('/recipe/{{ .Recipe.Id }}');">
         Add fermentable
       </a>
-      <a class="button is-light" onclick="showHop();">
+      <a class="button is-light" onclick="showHop('/recipe/{{ .Recipe.Id }}');">
         Add hop
       </a>
-      <a class="button is-light" onclick="showYeast();">
+      <a class="button is-light" onclick="showYeast('/recipe/{{ .Recipe.Id }}');">
         Add yeast
       </a>
       <table class="table is-hoverable is-fullwidth">
@@ -172,7 +172,7 @@
             <td>-</td>
             <td>{{ $v.Color }}</td>
             <td class="has-text-right-desktop">
-              <a class="button is-small" title="Edit" onclick="editFermentable('#fermentable-{{ $k }}')">
+              <a class="button is-small" title="Edit" onclick="editFermentable('/recipe/{{ $.Recipe.Id }}' ,'#fermentable-{{ $k }}')">
                 <span class="icon is-small"><i class="fas fa-edit"></i></span>
               </a>
               <a class="button is-small" title="Delete" href="/recipe/{{ $.Recipe.Id }}/del-fermentable/{{ $k }}">
@@ -195,7 +195,7 @@
             <td>{{ $v.Use }} - {{ $v.Time }}m</td>
             <td>{{ $v.Alpha }}</td>
             <td class="has-text-right-desktop">
-              <a class="button is-small" title="Edit" onclick="editHop('#hop-{{ $k }}')">
+              <a class="button is-small" title="Edit" onclick="editHop('/recipe/{{ $.Recipe.Id }}', '#hop-{{ $k }}')">
                 <span class="icon is-small"><i class="fas fa-edit"></i></span>
               </a>
               <a class="button is-small" title="Delete" href="/recipe/{{ $.Recipe.Id }}/del-hop/{{ $k }}">
@@ -218,7 +218,7 @@
             <td>-</td>
             <td>{{ $v.Attenuation }}</td>
             <td class="has-text-right-desktop">
-              <a class="button is-small" title="Edit" onclick="editYeast('#yeast-{{ $k }}')">
+              <a class="button is-small" title="Edit" onclick="editYeast('/recipe/{{ $.Recipe.Id }}', '#yeast-{{ $k }}')">
                 <span class="icon is-small"><i class="fas fa-edit"></i></span>
               </a>
               <a class="button is-small" title="Delete" href="/recipe/{{ $.Recipe.Id }}/del-yeast/{{ $k }}">
@@ -296,219 +296,7 @@
   </div>
 </div>
 
-<div class="modal" id="modal-fermentable">
-  <div class="modal-background"></div>
-  <div class="modal-card">
-    <header class="modal-card-head">
-      <p class="modal-card-title" id="title"></p>
-      <button class="delete" aria-label="close" onclick="hideModal('fermentable');">
-      </button>
-    </header>
-    <section class="modal-card-body">
-      <form method="post">
-        <div class="field is-horizontal">
-          <div class="field-body">
-            <div class="field">
-              <label class="label" for="name">Name</label>
-              <div class="control">
-                <input class="input" type="text" id="name" name="name">
-              </div>
-            </div>
-            <div class="field">
-              <label class="label">Type</label>
-              <div class="control">
-                <div class="select is-fullwidth">
-                  <select name="type" id="type">
-                    <option value="Grain">Grain</option>
-                    <option value="Sugar">Sugar</option>
-                    <option value="Extract">Extract</option>
-                    <option value="Dry extract">Dry extract</option>
-                    <option value="Adjunct">Adjunct</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-            <div class="field">
-              <label class="label" for="color">SRM</label>
-              <div class="control">
-                <input class="input" type="number" step="0.01" id="color" name="color">
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="field is-horizontal">
-          <div class="field-body">
-            <div class="field">
-              <label class="label" for="amount">Amount (kg)</label>
-              <div class="control">
-                <input class="input" type="number" step="0.001" id="amount" name="amount">
-              </div>
-            </div>
-            <div class="field">
-              <label class="label" for="yield">Yield</label>
-              <div class="control">
-                <input class="input" type="number" step="0.01" id="yield" name="yield">
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="field">
-          <div class="control">
-            <button class="button is-link" id="button">Add</button>
-          </div>
-        </div>
-      </form>
-    </section>
-  </div>
-</div>
-
-<div class="modal" id="modal-hop">
-  <div class="modal-background"></div>
-  <div class="modal-card">
-    <header class="modal-card-head">
-      <p class="modal-card-title" id="title"></p>
-      <button class="delete" aria-label="close" onclick="hideModal('hop');">
-      </button>
-    </header>
-    <section class="modal-card-body">
-      <form method="post">
-        <div class="field is-horizontal">
-          <div class="field-body">
-            <div class="field">
-              <label class="label" for="name">Name</label>
-              <div class="control">
-                <input class="input" type="text" id="name" name="name">
-              </div>
-            </div>
-            <div class="field">
-              <label class="label">Form</label>
-              <div class="control">
-                <div class="select is-fullwidth">
-                  <select name="form" id="form">
-                    <option value="Pellet">Pellet</option>
-                    <option value="Leaf">Leaf</option>
-                    <option value="Plug">Plug</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-            <div class="field">
-              <label class="label" for="alpha">Alpha (%)</label>
-              <div class="control">
-                <input class="input" type="number" step="0.1" id="alpha" name="alpha">
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="field is-horizontal">
-          <div class="field-body">
-            <div class="field">
-              <label class="label">Use</label>
-              <div class="control">
-                <div class="select is-fullwidth">
-                  <select name="use" id="use">
-                    <option value="Boil">Boil</option>
-                    <option value="Dry hop">Dry hop</option>
-                    <option value="Mash">Mash</option>
-                    <option value="First wort">First wort</option>
-                    <option value="Aroma">Aroma</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-            <div class="field">
-              <label class="label" for="amount">Amount (kg)</label>
-              <div class="control">
-                <input class="input" type="number" step="0.001" id="amount" name="amount">
-              </div>
-            </div>
-            <div class="field">
-              <label class="label" for="time">Time (m)</label>
-              <div class="control">
-                <input class="input" type="number" id="time" name="time">
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="field">
-          <div class="control">
-            <button class="button is-link" id="button"></button>
-          </div>
-        </div>
-      </form>
-    </section>
-  </div>
-</div>
-
-<div class="modal" id="modal-yeast">
-  <div class="modal-background"></div>
-  <div class="modal-card">
-    <header class="modal-card-head">
-      <p class="modal-card-title" id="title"></p>
-      <button class="delete" aria-label="close" onclick="hideModal('yeast');">
-      </button>
-    </header>
-    <section class="modal-card-body">
-      <form method="post">
-        <div class="field is-horizontal">
-          <div class="field-body">
-            <div class="field">
-              <label class="label" for="name">Name</label>
-              <div class="control">
-                <input class="input" type="text" id="name" name="name">
-              </div>
-            </div>
-            <div class="field">
-              <label class="label">Form</label>
-              <div class="control">
-                <div class="select is-fullwidth">
-                  <select name="form" id="form">
-                    <option value="Liquid">Liquid</option>
-                    <option value="Dry">Dry</option>
-                    <option value="Slant">Slant</option>
-                    <option value="Culture">Culture</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-            <div class="field">
-              <label class="label" for="attenuation">Attenuation</label>
-              <div class="control">
-                <input class="input" type="number" step="0.1" id="attenuation" name="attenuation">
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="field is-horizontal">
-          <div class="field-body">
-            <div class="field">
-              <label class="label" for="amount">Amount</label>
-              <div class="control">
-                <input class="input" type="number" step="0.001" id="amount" name="amount">
-              </div>
-            </div>
-            <div class="field">
-              <label class="label">Amount unit</label>
-              <div class="control">
-                <div class="select is-fullwidth">
-                  <select name="unit" id="unit">
-                    <option value="kilogram">Kilogram</option>
-                    <option value="litre">Litre</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="field">
-          <div class="control">
-            <button class="button is-link" id="button"></button>
-          </div>
-        </div>
-      </form>
-    </section>
-  </div>
-</div>
+{{ template "ingredient-modals.html" . }}
 
 <div class="modal" id="modal-mash-step">
   <div class="modal-background"></div>
@@ -577,81 +365,15 @@
 </div>
 
 <script>
-  function configureModal(id, title, button, action) {
-    $(`#modal-${id} #title`).text(title);
-    $(`#modal-${id} #button`).text(button);
-    $(`#modal-${id} form`).attr("action", action);
-  }
-
-  function showFermentable() {
-    configureModal("fermentable", "{{ L "Add fermentable" }}", "{{ L "Add" }}",
-                   "/recipe/{{ .Recipe.Id }}/add-fermentable");
-    showModal("fermentable");
-  }
-
-  function showHop() {
-    configureModal("hop", "{{ L "Add hop" }}", "{{ L "Add" }}",
-                   "/recipe/{{ .Recipe.Id }}/add-hop");
-    showModal("hop");
-  }
-
-  function showYeast() {
-    configureModal("yeast", "{{ L "Add yeast" }}", "{{ L "Add" }}",
-                   "/recipe/{{ .Recipe.Id }}/add-yeast");
-    showModal("yeast");
-  }
-
   function showMashStep() {
     configureModal("mash-step", "{{ L "Add mash step" }}", "{{ L "Add" }}",
                    "/recipe/{{ .Recipe.Id }}/add-mash-step");
     showModal("mash-step");
   }
 
-  function editFermentable(id) {
-    configureModal("fermentable", "{{ L "Edit fermentable" }}", "{{ L "Save" }}",
-                   "/recipe/{{ .Recipe.Id }}/save-fermentable/" + $(id).data("id"));
-    showModal('fermentable');
-
-    $("#modal-fermentable #name").val($(id).data("name"));
-    $("#modal-fermentable #type").val($(id).data("type"));
-    $("#modal-fermentable #amount").val($(id).data("amount"));
-    $("#modal-fermentable #yield").val($(id).data("yield"));
-    $("#modal-fermentable #color").val($(id).data("color"));
-  }
-
-  function editHop(id) {
-    configureModal("hop", "{{ L "Edit hop" }}", "{{ L "Save" }}",
-                   "/recipe/{{ .Recipe.Id }}/save-hop/" + $(id).data("id"));
-    showModal('hop');
-
-    $("#modal-hop #name").val($(id).data("name"));
-    $("#modal-hop #form").val($(id).data("form"));
-    $("#modal-hop #amount").val($(id).data("amount"));
-    $("#modal-hop #use").val($(id).data("use"));
-    $("#modal-hop #time").val($(id).data("time"));
-    $("#modal-hop #alpha").val($(id).data("alpha"));
-  }
-
-  function editYeast(id) {
-    configureModal("yeast", "{{ L "Edit yeast" }}", "{{ L "Save" }}",
-                   "/recipe/{{ .Recipe.Id }}/save-yeast/" + $(id).data("id"));
-    showModal('yeast')
-
-    $("#modal-yeast #name").val($(id).data("name"));
-    $("#modal-yeast #form").val($(id).data("form"));
-    $("#modal-yeast #amount").val($(id).data("amount"));
-    $("#modal-yeast #attenuation").val($(id).data("attenuation"));
-
-    if ($(id).data("amount-is-weight")) {
-      $("#modal-yeast #unit").val("kilogram");
-    } else {
-      $("#modal-yeast #unit").val("litre");
-    }
-  }
-
   function editMashStep(id) {
     configureModal("mash-step", "{{ L "Edit mash step" }}", "{{ L "Save" }}",
-                   "/recipe/{{ .Recipe.Id }}/save-mash-step/" + $(id).data("id"));
+                   "/recipe/{{ .Recipe.Id }}/edit-mash-step/" + $(id).data("id"));
     showModal('mash-step');
 
     $("#modal-mash-step #name").val($(id).data("name"));

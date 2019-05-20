@@ -97,6 +97,9 @@ func Serve(bind string, db *db.DB, i18n *i18n.Bundle, noSignUp, debug, skipLogin
 	s.handleFunc("/account", s.account)
 	s.handleFunc("/account/save", s.saveAccount)
 	s.handleFunc("/account/delete", s.deleteAccount)
+	s.handleFunc("/inventory", s.inventory)
+	s.handleFunc("/inventory/{Action:[a-z-]+}", s.saveInventory)
+	s.handleFunc("/inventory/{Action:[a-z-]+}/{Item:[0-9]+}", s.saveInventory)
 
 	// Start serving over HTTP.
 	return http.ListenAndServe(bind, s.mux)

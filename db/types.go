@@ -37,3 +37,14 @@ type Recipe struct {
 	Public  bool
 	XML     *beerxml.Recipe
 }
+
+// Represents an ingredient (fermentable, hops, yeats, ...) in an user inventory
+// and contains a path to its associated BeerXML file.
+type Ingredient struct {
+	Id     int64
+	UserId int64
+	Name   string
+	Type   string
+	File   string
+	XML    interface{}
+}

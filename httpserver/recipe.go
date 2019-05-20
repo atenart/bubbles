@@ -257,30 +257,30 @@ func (s *Server) saveRecipe(w http.ResponseWriter, r *http.Request, user *db.Use
 		http.Redirect(w, r, "/", 302)
 		return
 	case "add-fermentable":
-		fermentable, err := formToFermentable(r)
-		if err != nil {
+		var fermentable beerxml.Fermentable
+		if err := formToFermentable(r, &fermentable); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
 
-		if err := beerxml.InsertToRecipe(recipe.XML, fermentable); err != nil {
+		if err := beerxml.InsertToRecipe(recipe.XML, &fermentable); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
 	case "add-hop":
-		hop, err := formToHop(r)
-		if err != nil {
+		var hop beerxml.Hop
+		if err := formToHop(r, &hop); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
 
-		if err := beerxml.InsertToRecipe(recipe.XML, hop); err != nil {
+		if err := beerxml.InsertToRecipe(recipe.XML, &hop); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
 	case "add-yeast":
-		yeast, err := formToYeast(r)
-		if err != nil {
+		var yeast beerxml.Yeast
+		if err := formToYeast(r, &yeast); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
@@ -300,9 +300,9 @@ func (s *Server) saveRecipe(w http.ResponseWriter, r *http.Request, user *db.Use
 			http.Error(w, err.Error(), 500)
 			return
 		}
-	case "save-fermentable":
-		fermentable, err := formToFermentable(r)
-		if err != nil {
+	case "edit-fermentable":
+		var fermentable beerxml.Fermentable
+		if err := formToFermentable(r, &fermentable); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
@@ -312,13 +312,13 @@ func (s *Server) saveRecipe(w http.ResponseWriter, r *http.Request, user *db.Use
 			return
 		}
 
-		if err := beerxml.InsertToRecipe(recipe.XML, fermentable); err != nil {
+		if err := beerxml.InsertToRecipe(recipe.XML, &fermentable); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
-	case "save-hop":
-		hop, err := formToHop(r)
-		if err != nil {
+	case "edit-hop":
+		var hop beerxml.Hop
+		if err := formToHop(r, &hop); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
@@ -328,13 +328,13 @@ func (s *Server) saveRecipe(w http.ResponseWriter, r *http.Request, user *db.Use
 			return
 		}
 
-		if err := beerxml.InsertToRecipe(recipe.XML, hop); err != nil {
+		if err := beerxml.InsertToRecipe(recipe.XML, &hop); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
-	case "save-yeast":
-		yeast, err := formToYeast(r)
-		if err != nil {
+	case "edit-yeast":
+		var yeast beerxml.Yeast
+		if err := formToYeast(r, &yeast); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
@@ -344,11 +344,11 @@ func (s *Server) saveRecipe(w http.ResponseWriter, r *http.Request, user *db.Use
 			return
 		}
 
-		if err := beerxml.InsertToRecipe(recipe.XML, yeast); err != nil {
+		if err := beerxml.InsertToRecipe(recipe.XML, &yeast); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
-	case "save-mash-step":
+	case "edit-mash-step":
 		mashStep, err := formToMashStep(r)
 		if err != nil {
 			http.Error(w, err.Error(), 500)
@@ -447,9 +447,7 @@ func updateStyle(r *http.Request, recipe *db.Recipe, styles *[]beerxml.Style) {
 }
 
 // Convert elements POSTed from a form into a beerxml.Fermentable.
-func formToFermentable(r *http.Request) (*beerxml.Fermentable, error) {
-	var fermentable beerxml.Fermentable
-
+func formToFermentable(r *http.Request, fermentable *beerxml.Fermentable) error {
 	fermentable.Name = r.FormValue("name")
 	fermentable.Type = r.FormValue("type")
 	fermentable.Yield, _ = strconv.ParseFloat(r.FormValue("yield"), 64)
@@ -458,16 +456,14 @@ func formToFermentable(r *http.Request) (*beerxml.Fermentable, error) {
 
 	// Sanity checks
 	if fermentable.Name == "" {
-		return nil, fmt.Errorf("'Name' is required.")
+		return fmt.Errorf("'Name' is required.")
 	}
 
-	return &fermentable, nil
+	return nil
 }
 
 // Convert elements POSTed from a form into a beerxml.Hop.
-func formToHop(r *http.Request) (*beerxml.Hop, error) {
-	var hop beerxml.Hop
-
+func formToHop(r *http.Request, hop *beerxml.Hop) error {
 	hop.Name = r.FormValue("name")
 	hop.Form = r.FormValue("form")
 	hop.Use = r.FormValue("use")
@@ -477,31 +473,26 @@ func formToHop(r *http.Request) (*beerxml.Hop, error) {
 
 	// Sanity checks
 	if hop.Name == "" {
-		return nil, fmt.Errorf("'Name' is required.")
+		return fmt.Errorf("'Name' is required.")
 	}
 
-	return &hop, nil
+	return nil
 }
 
 // Convert elements POSTed from a form into a beerxml.Yeast.
-func formToYeast(r *http.Request) (*beerxml.Yeast, error) {
-	var yeast beerxml.Yeast
-
+func formToYeast(r *http.Request, yeast *beerxml.Yeast) error {
 	yeast.Name = r.FormValue("name")
 	yeast.Form = r.FormValue("form")
 	yeast.Attenuation, _ = strconv.ParseFloat(r.FormValue("attenuation"), 64)
 	yeast.Amount, _ = strconv.ParseFloat(r.FormValue("amount"), 64)
-
-	if r.FormValue("unit") == "kilogram" {
-		yeast.AmountIsWeight = true
-	}
+	yeast.AmountIsWeight = r.FormValue("unit") == "kilogram"
 
 	// Sanity checks
 	if yeast.Name == "" {
-		return nil, fmt.Errorf("'Name' is required.")
+		return fmt.Errorf("'Name' is required.")
 	}
 
-	return &yeast, nil
+	return nil
 }
 
 // Convert elements POSTed from a form into a beerxml.MashStep.

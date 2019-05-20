@@ -19,6 +19,7 @@ import (
 	s "sort"
 
 	"github.com/atenart/bubbles/beerxml"
+	"github.com/atenart/bubbles/db"
 )
 
 // Sort a slice of beerxml.Fermentable.
@@ -53,7 +54,7 @@ func sortHops(hops []beerxml.Hop) {
 		// largest 'amount' first, or
 		// largest 'alpha' first, or fallback to
 		// 'name' in alphabetical order.
-		if uses[hops[i].Use] != uses[hops[j].Use] {
+		if hops[i].Use != hops[j].Use {
 			return uses[hops[i].Use] < uses[hops[j].Use]
 		} else if hops[i].Time != hops[j].Time {
 			return hops[i].Time > hops[j].Time
@@ -84,10 +85,29 @@ func sortYeasts(yeasts []beerxml.Yeast) {
 }
 
 // Sort a slice of beerxml.MashStep.
-func sortMashStep(steps []beerxml.MashStep) {
+func sortMashSteps(steps []beerxml.MashStep) {
 	s.Slice(steps, func(i, j int) bool {
 		// Lowest temperature first.
 		return steps[i].StepTemp < steps[j].StepTemp
+	})
+}
+
+// Sort a slice of beerxml.Ingredient.
+func sortIngredients(ingredients []*db.Ingredient) {
+	s.Slice(ingredients, func(i, j int) bool {
+		uses := map[string]int{
+			"fermentable": 0,
+			"hop": 1,
+			"yeast": 2,
+		}
+
+		// Smallest 'type' priority first, or fallback to
+		// 'name' in alphabetical order.
+		if ingredients[i].Type != ingredients[j].Type {
+			return uses[ingredients[i].Type] < uses[ingredients[j].Type]
+		}
+
+		return ingredients[i].Name < ingredients[j].Name
 	})
 }
 
@@ -100,6 +120,8 @@ func sort(slice interface{}) {
 	case []beerxml.Yeast:
 		sortYeasts(elmt)
 	case []beerxml.MashStep:
-		sortMashStep(elmt)
+		sortMashSteps(elmt)
+	case []*db.Ingredient:
+		sortIngredients(elmt)
 	}
 }

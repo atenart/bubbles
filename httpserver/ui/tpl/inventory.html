@@ -1,0 +1,92 @@
+{{ template "head.html" . }}
+
+{{ template "navigation.html" }}
+
+<section class="section">
+  <div class="container">
+    <h1 class="title is-4">{{ L "Ingredients inventory" }}</h1>
+    <a class="button is-light" onclick="showFermentable('/inventory');">
+      Add fermentable
+    </a>
+    <a class="button is-light" onclick="showHop('/inventory');">
+      Add hop
+    </a>
+    <a class="button is-light" onclick="showYeast('/inventory');">
+      Add yeast
+    </a>
+    <table class="table is-hoverable is-fullwidth">
+      <thead>
+        <tr>
+          <th></th>
+          <th>{{ L "Name" }}</th>
+          <th>{{ L "Type / Form" }}</th>
+          <th>{{ L "Amount" }}</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+{{ if .Ingredients }}
+{{ range .Ingredients }}
+
+{{ if eq .Type "fermentable" }}
+        <tr id="fermentable-{{ .Id }}" data-id="{{ .Id }}" data-name="{{ .XML.Name }}" data-type="{{ .XML.Type }}"
+            data-amount="{{ .XML.Amount }}" data-yield="{{ .XML.Yield }}" data-color="{{ .XML.Color }}">
+          <td><abbr title="Fermentable">F</abbr></td>
+          <td>{{ .XML.Name }}</td>
+          <td>{{ .XML.Type }}</td>
+          <td>{{ .XML.Amount }}kg</td>
+          <td>
+            <a class="button is-small" title="Edit" onclick="editFermentable('/inventory' ,'#fermentable-{{ .Id }}')">
+              <span class="icon is-small"><i class="fas fa-edit"></i></span>
+            </a>
+            <a class="button is-small" title="Delete" href="/inventory/del/{{ .Id }}">
+              <span class="icon is-small"><i class="fas fa-trash"></i></span>
+            </a>
+          </td>
+        </tr>
+{{ else if eq .Type "hop" }}
+        <tr id="hop-{{ .Id }}" data-id="{{ .Id }}" data-name="{{ .XML.Name }}" data-form="{{ .XML.Form }}"
+            data-amount="{{ .XML.Amount }}" data-use="{{ .XML.Use }}" data-time="{{ .XML.Time }}"
+            data-alpha="{{ .XML.Alpha }}">
+          <td><abbr title="Hop">H</abbr></td>
+          <td>{{ .XML.Name }}</td>
+          <td>{{ .XML.Form }}</td>
+          <td>{{ .XML.Amount }}kg</td>
+          <td>
+            <a class="button is-small" title="Edit" onclick="editHop('/inventory' ,'#hop-{{ .Id }}')">
+              <span class="icon is-small"><i class="fas fa-edit"></i></span>
+            </a>
+            <a class="button is-small" title="Delete" href="/inventory/del/{{ .Id }}">
+              <span class="icon is-small"><i class="fas fa-trash"></i></span>
+            </a>
+          </td>
+        </tr>
+{{ else if eq .Type "yeast" }}
+        <tr id="yeast-{{ .Id }}" data-id="{{ .Id }}" data-name="{{ .XML.Name }}" data-form="{{ .XML.Form }}"
+            data-amount="{{ .XML.Amount }}" data-amount-is-weight="{{ .XML.AmountIsWeight }}"
+            data-attenuation="{{ .XML.Attenuation }}">
+          <td><abbr title="Yeast">Y</abbr></td>
+          <td>{{ .XML.Name }}</td>
+          <td>{{ .XML.Form }}</td>
+          <td>{{ .XML.Amount }}{{ if .XML.AmountIsWeight }}kg{{ else }}l{{ end }}</td>
+          <td>
+            <a class="button is-small" title="Edit" onclick="editYeast('/inventory' ,'#yeast-{{ .Id }}')">
+              <span class="icon is-small"><i class="fas fa-edit"></i></span>
+            </a>
+            <a class="button is-small" title="Delete" href="/inventory/del/{{ .Id }}">
+              <span class="icon is-small"><i class="fas fa-trash"></i></span>
+            </a>
+          </td>
+        </tr>
+{{ end }}
+
+{{ end }}
+{{ end }}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+{{ template "ingredient-modals.html" . }}
+
+{{ template "foot.html" }}

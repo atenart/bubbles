@@ -30,11 +30,7 @@ func Import(file string, data interface{}) error {
 	defer f.Close()
 
 	d := xml.NewDecoder(f)
-	if err = d.Decode(data); err != nil {
-		return err
-	}
-
-	return nil
+	return d.Decode(data)
 }
 
 // Write a BeerXML object to a file.
@@ -47,11 +43,7 @@ func Export(data interface{}, file string) error {
 
 	e := xml.NewEncoder(f)
 	e.Indent("", "    ")
-	if err = e.Encode(data); err != nil {
-		return err
-	}
-
-	return nil
+	return e.Encode(data)
 }
 
 // Insert a recipe element into a Recipe object.

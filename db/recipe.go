@@ -16,7 +16,6 @@
 package db
 
 import (
-	"io"
 	"os"
 	"path"
 
@@ -33,7 +32,9 @@ func (db *DB) GetRecipe(id int64) (*Recipe, error) {
 		return nil, err
 	}
 
-	db.importXML(&r)
+	if err := db.importXML(r.File, &r.XML); err != nil {
+		return nil, err
+	}
 
 	return &r, nil
 }
@@ -51,21 +52,12 @@ func (db *DB) GetUserRecipes(uid int64) ([]*Recipe, error) {
 		row.Scan(&r.Id, &r.UserId, &r.Name, &r.File, &r.Public)
 
 		recipes = append(recipes, &r)
-		db.importXML(&r)
+		if err := db.importXML(r.File, &r.XML); err != nil {
+			return nil, err
+		}
 	}
 
 	return recipes, nil
-}
-
-// Import a BeerXML recipe associated with a Recipe.
-func (db *DB) importXML(recipe *Recipe) error {
-	if err := beerxml.Import(path.Join(db.rootdir, recipe.File), &recipe.XML); err == io.EOF {
-		recipe.XML = &beerxml.Recipe{}
-	} else if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 // Generate a new uniq filename, and create it in $rootdir/
@@ -92,7 +84,7 @@ func (db *DB) newUniqFile() (string, error) {
 	return path.Join(subdir, file), nil
 }
 
-// Save a new recipe.
+// Add a new recipe.
 func (db *DB) AddRecipe(r *Recipe) (int64, error) {
 	var err error
 	if r.File, err = db.newUniqFile(); err != nil {
@@ -112,7 +104,7 @@ VALUES (?, ?, ?, ?)`, r.UserId, r.Name, r.File, r.Public)
 		return -1, err
 	}
 
-	if err := beerxml.Export(&r.XML, path.Join(db.rootdir, r.File)); err != nil {
+	if err := beerxml.Export(r.XML, path.Join(db.rootdir, r.File)); err != nil {
 		return -1, err
 	}
 

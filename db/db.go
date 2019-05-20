@@ -56,6 +56,17 @@ CREATE TABLE IF NOT EXISTS recipes (
 	public INTEGER DEFAULT 0
 )
 `,
+	`
+CREATE TABLE IF NOT EXISTS ingredients (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	user_id INTEGER NOT NULL,
+	name TEXT NOT NULL,
+	type TEXT NOT NULL,
+	file TEXT NOT NULL,
+	--
+	CONSTRAINT tuple UNIQUE (user_id, name, type)
+)
+`,
 }
 
 // Open a database, and create it if it does not exists.
@@ -95,4 +106,9 @@ func GenToken(sz int) string {
 		token[i] = charset[rand.Intn(len(charset))]
 	}
 	return string(token)
+}
+
+// Import a BeerXML file associated with a DB entry.
+func (db *DB) importXML(file string, XML interface{}) error {
+	return beerxml.Import(path.Join(db.rootdir, file), XML)
 }
