@@ -81,3 +81,13 @@ func (s *Server) saveAccount(w http.ResponseWriter, r *http.Request, user *db.Us
 
 	http.Redirect(w, r, "/account", 302)
 }
+
+// Delete an user account and all its data.
+func (s *Server) deleteAccount(w http.ResponseWriter, r *http.Request, user *db.User) {
+	if err := s.db.DeleteUser(user); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	s.logout(w, r)
+}

@@ -79,3 +79,38 @@ REPLACE INTO users (id, email, password, token, enabled, lang)
 VALUES (?, ?, ?, ?, ?, ?)`, u.Id, u.Email, u.Password, u.Token, u.Enabled, u.Lang)
 	return err
 }
+
+// Delete an user and all its data.
+func (db *DB) DeleteUser(u *User) error {
+	// Delete all the ingredients associated to the user.
+	ingredients, err := db.GetUserIngredients(u.Id)
+	if err != nil {
+		return err
+	}
+
+	for _, i := range ingredients {
+		if err := db.DeleteIngredient(i); err != nil {
+			return err
+		}
+	}
+
+	// Delete all the recipes associated to the user.
+	recipes, err := db.GetUserRecipes(u.Id)
+	if err != nil {
+		return err
+	}
+
+	for _, r := range recipes {
+		if err := db.DeleteRecipe(r); err != nil {
+			return err
+		}
+	}
+
+	// Now, delete the user itself. Do this at the end: if something went
+	// bad, the user can still log in to report the issue.
+	if _, err := db.Exec("DELETE FROM users WHERE id == ?", u.Id); err != nil {
+		return err
+	}
+
+	return nil
+}
