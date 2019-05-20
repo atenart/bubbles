@@ -104,6 +104,7 @@
         </div>
         <div class="field is-horizontal">
           <div class="field-body">
+{{ if eq pageName "recipe.html" }}
             <div class="field">
               <label class="label">Use</label>
               <div class="control">
@@ -118,18 +119,21 @@
                 </div>
               </div>
             </div>
+{{ end }}
             <div class="field">
               <label class="label" for="amount">Amount (kg)</label>
               <div class="control">
                 <input class="input" type="number" step="0.001" id="amount" name="amount">
               </div>
             </div>
+{{ if eq pageName "recipe.html" }}
             <div class="field">
               <label class="label" for="time">Time (m)</label>
               <div class="control">
                 <input class="input" type="number" id="time" name="time">
               </div>
             </div>
+{{ end }}
           </div>
         </div>
         <div class="field">

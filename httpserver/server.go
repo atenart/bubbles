@@ -64,6 +64,9 @@ func Serve(bind string, db *db.DB, i18n *i18n.Bundle, noSignUp, debug, skipLogin
 	// i18n: add dummy L function, will be overriden before serving the
 	// templates.
 	s.templates.Funcs(template.FuncMap{
+		"pageName": func() string {
+			return ""
+		},
 		"L": func(id string) string {
 			return id
 		},
@@ -170,6 +173,9 @@ func (s *Server) executeTemplate(w http.ResponseWriter, user *db.User, name stri
 
 		// Set the i18n func.
 		clone.Funcs(template.FuncMap{
+			"pageName": func() string {
+				return name
+			},
 			"L": func(id string) string {
 				return l.Localize(id)
 			},
