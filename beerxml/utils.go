@@ -49,10 +49,10 @@ func Export(data interface{}, file string) error {
 // Insert a recipe element into a Recipe object.
 func InsertToRecipe(recipe *Recipe, e interface{}) error {
 	switch elmt := e.(type) {
-	case *Hop:
-		recipe.Hops = append(recipe.Hops, *elmt)
 	case *Fermentable:
 		recipe.Fermentables = append(recipe.Fermentables, *elmt)
+	case *Hop:
+		recipe.Hops = append(recipe.Hops, *elmt)
 	case *Yeast:
 		recipe.Yeasts = append(recipe.Yeasts, *elmt)
 	case *Misc:

@@ -58,18 +58,46 @@ func (s *Server) recipe(w http.ResponseWriter, r *http.Request, user *db.User) {
 		return
 	}
 
+	// Retrieve the user's ingredients from its inventory.
+	ingredients, err := s.db.GetUserIngredients(user.Id)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	// Sort ingredients.
+	var fermentables []*beerxml.Fermentable
+	var hops []*beerxml.Hop
+	var yeasts []*beerxml.Yeast
+	for _, i := range ingredients {
+		switch xml := i.XML.(type) {
+		case *beerxml.Fermentable:
+			fermentables = append(fermentables, xml)
+		case *beerxml.Hop:
+			hops = append(hops, xml)
+		case *beerxml.Yeast:
+			yeasts = append(yeasts, xml)
+		}
+	}
+
 	s.executeTemplate(w, user, "recipe.html", struct{
-		Title  string
-		User   *db.User
-		Recipe *db.Recipe
-		Styles *[]beerxml.Style
-		Calc   *Calculation
+		Title        string
+		User         *db.User
+		Recipe       *db.Recipe
+		Styles       *[]beerxml.Style
+		Calc         *Calculation
+		Fermentables []*beerxml.Fermentable
+		Hops         []*beerxml.Hop
+		Yeasts       []*beerxml.Yeast
 	}{
 		fmt.Sprintf("Bubbles - recipe/%s", recipe.Name),
 		user,
 		recipe,
 		s.db.Styles,
 		calculations(recipe),
+		fermentables,
+		hops,
+		yeasts,
 	})
 }
 
@@ -285,7 +313,7 @@ func (s *Server) saveRecipe(w http.ResponseWriter, r *http.Request, user *db.Use
 			return
 		}
 
-		if err := beerxml.InsertToRecipe(recipe.XML, yeast); err != nil {
+		if err := beerxml.InsertToRecipe(recipe.XML, &yeast); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}

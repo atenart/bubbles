@@ -8,6 +8,28 @@
     </header>
     <section class="modal-card-body">
       <form method="post">
+{{ if eq pageName "recipe.html" }}
+{{ if .Fermentables }}
+        <div class="field is-horizontal">
+          <div class="field-body">
+            <div class="field">
+              <input class="input" type="text" list="inventory-fermentables-list"
+                id="inventory-fermentables" placeholder="{{ L "Search in inventory" }}"
+                onchange="selectFermentable();">
+              <datalist id="inventory-fermentables-list">
+{{ range .Fermentables }}
+                <option id="inventory-fermentable-{{ .Name }}" value="{{ .Name }}"
+                  data-name="{{ .Name }}" data-type="{{ .Type }}"
+                  data-yield="{{ .Yield }}" data-color="{{ .Color }}">
+                  {{ .Name }}
+                </option>
+{{ end }}
+              </datalist>
+            </div>
+          </div>
+        </div>
+{{ end }}
+{{ end }}
         <div class="field is-horizontal">
           <div class="field-body">
             <div class="field">
@@ -74,6 +96,28 @@
     </header>
     <section class="modal-card-body">
       <form method="post">
+{{ if eq pageName "recipe.html" }}
+{{ if .Hops }}
+        <div class="field is-horizontal">
+          <div class="field-body">
+            <div class="field">
+              <input class="input" type="text" list="inventory-hops-list"
+                id="inventory-hops" placeholder="{{ L "Search in inventory" }}"
+                onchange="selectHop();">
+              <datalist id="inventory-hops-list">
+{{ range .Hops }}
+                <option id="inventory-hop-{{ .Name }}" value="{{ .Name }}"
+                  data-name="{{ .Name }}" data-form="{{ .Form }}" data-time="{{ .Time }}"
+                  data-alpha="{{ .Alpha }}">
+                  {{ .Name }}
+                </option>
+{{ end }}
+              </datalist>
+            </div>
+          </div>
+        </div>
+{{ end }}
+{{ end }}
         <div class="field is-horizontal">
           <div class="field-body">
             <div class="field">
@@ -156,6 +200,28 @@
     </header>
     <section class="modal-card-body">
       <form method="post">
+{{ if eq pageName "recipe.html" }}
+{{ if .Yeasts }}
+        <div class="field is-horizontal">
+          <div class="field-body">
+            <div class="field">
+              <input class="input" type="text" list="inventory-yeasts-list"
+                id="inventory-yeasts" placeholder="{{ L "Search in inventory" }}"
+                onchange="selectYeast();">
+              <datalist id="inventory-yeasts-list">
+{{ range .Yeasts }}
+                <option id="inventory-yeast-{{ .Name }}" value="{{ .Name }}"
+                  data-name="{{ .Name }}" data-form="{{ .Form }}"
+                  data-attenuation="{{ .Attenuation }}">
+                  {{ .Name }}
+                </option>
+{{ end }}
+              </datalist>
+            </div>
+          </div>
+        </div>
+{{ end }}
+{{ end }}
         <div class="field is-horizontal">
           <div class="field-body">
             <div class="field">
@@ -307,11 +373,7 @@
     showModal("yeast");
   }
 
-  function editFermentable(prefix, id) {
-    configureModal("fermentable", "{{ L "Edit fermentable" }}", "{{ L "Save" }}",
-                   prefix + "/edit-fermentable/" + $(id).data("id"));
-    showModal('fermentable');
-
+  function fillFermentable(id) {
     $("#modal-fermentable #name").val($(id).data("name"));
     $("#modal-fermentable #type").val($(id).data("type"));
     $("#modal-fermentable #amount").val($(id).data("amount"));
@@ -319,11 +381,7 @@
     $("#modal-fermentable #color").val($(id).data("color"));
   }
 
-  function editHop(prefix, id) {
-    configureModal("hop", "{{ L "Edit hop" }}", "{{ L "Save" }}",
-                   prefix + "/edit-hop/" + $(id).data("id"));
-    showModal('hop');
-
+  function fillHop(id) {
     $("#modal-hop #name").val($(id).data("name"));
     $("#modal-hop #form").val($(id).data("form"));
     $("#modal-hop #amount").val($(id).data("amount"));
@@ -332,20 +390,67 @@
     $("#modal-hop #alpha").val($(id).data("alpha"));
   }
 
-  function editYeast(prefix, id) {
-    configureModal("yeast", "{{ L "Edit yeast" }}", "{{ L "Save" }}",
-                   prefix + "/edit-yeast/" + $(id).data("id"));
-    showModal('yeast');
-
+  function fillYeast(id) {
     $("#modal-yeast #name").val($(id).data("name"));
     $("#modal-yeast #form").val($(id).data("form"));
     $("#modal-yeast #amount").val($(id).data("amount"));
     $("#modal-yeast #attenuation").val($(id).data("attenuation"));
 
-    if ($(id).data("amount-is-weight")) {
-      $("#modal-yeast #unit").val("kilogram");
-    } else {
+    if (!$(id).data("amount-is-weight")) {
       $("#modal-yeast #unit").val("litre");
+    } else {
+      $("#modal-yeast #unit").val("kilogram");
     }
+  }
+
+  function editFermentable(prefix, id) {
+    configureModal("fermentable", "{{ L "Edit fermentable" }}", "{{ L "Save" }}",
+                   prefix + "/edit-fermentable/" + $(id).data("id"));
+    showModal('fermentable');
+    fillFermentable(id);
+  }
+
+  function editHop(prefix, id) {
+    configureModal("hop", "{{ L "Edit hop" }}", "{{ L "Save" }}",
+                   prefix + "/edit-hop/" + $(id).data("id"));
+    showModal('hop');
+    fillHop(id);
+  }
+
+  function editYeast(prefix, id) {
+    configureModal("yeast", "{{ L "Edit yeast" }}", "{{ L "Save" }}",
+                   prefix + "/edit-yeast/" + $(id).data("id"));
+    showModal('yeast');
+    fillYeast(id);
+  }
+
+  function selectFermentable() {
+    var id = "#inventory-fermentable-" + $("#inventory-fermentables").val();
+
+    // Check the element exists.
+    if ($(id).length == 0)
+      return;
+
+    fillFermentable(id);
+  }
+
+  function selectHop() {
+    var id = "#inventory-hop-" + $("#inventory-hops").val();
+
+    // Check the element exists.
+    if ($(id).length == 0)
+      return;
+
+    fillHop(id);
+  }
+
+  function selectYeast() {
+    var id = "#inventory-yeast-" + $("#inventory-yeasts").val();
+
+    // Check the element exists.
+    if ($(id).length == 0)
+      return;
+
+    fillYeast(id);
   }
 </script>
