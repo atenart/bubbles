@@ -39,9 +39,9 @@
             <a class="button is-small" title="Edit" onclick="editFermentable('/inventory' ,'#fermentable-{{ .Id }}')">
               <span class="icon is-small"><i class="fas fa-edit"></i></span>
             </a>
-            <a class="button is-small" title="Delete" href="/inventory/del/{{ .Id }}">
+            <button class="button is-small" title="Delete" formaction="/inventory/del/{{ .Id }}">
               <span class="icon is-small"><i class="fas fa-trash"></i></span>
-            </a>
+            </button>
           </td>
         </tr>
 {{ else if eq .Type "hop" }}
@@ -56,9 +56,9 @@
             <a class="button is-small" title="Edit" onclick="editHop('/inventory' ,'#hop-{{ .Id }}')">
               <span class="icon is-small"><i class="fas fa-edit"></i></span>
             </a>
-            <a class="button is-small" title="Delete" href="/inventory/del/{{ .Id }}">
+            <button class="button is-small" title="Delete" formaction="/inventory/del/{{ .Id }}">
               <span class="icon is-small"><i class="fas fa-trash"></i></span>
-            </a>
+            </button>
           </td>
         </tr>
 {{ else if eq .Type "yeast" }}
@@ -73,9 +73,9 @@
             <a class="button is-small" title="Edit" onclick="editYeast('/inventory' ,'#yeast-{{ .Id }}')">
               <span class="icon is-small"><i class="fas fa-edit"></i></span>
             </a>
-            <a class="button is-small" title="Delete" href="/inventory/del/{{ .Id }}">
+            <button class="button is-small" title="Delete" formaction="/inventory/del/{{ .Id }}">
               <span class="icon is-small"><i class="fas fa-trash"></i></span>
-            </a>
+            </button>
           </td>
         </tr>
 {{ end }}
