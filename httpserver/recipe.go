@@ -438,6 +438,7 @@ func formToRecipe(r *http.Request, recipe *db.Recipe) error {
 
 	// First convert elements going directly into the db.Recipe.
 	recipe.Name = r.FormValue("name")
+	recipe.XML.Name = recipe.Name
 	if recipe.Public, err = strconv.ParseBool(r.FormValue("public")); err != nil {
 		return err
 	}

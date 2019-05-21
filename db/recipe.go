@@ -104,7 +104,7 @@ VALUES (?, ?, ?, ?)`, r.UserId, r.Name, r.File, r.Public)
 		return -1, err
 	}
 
-	if err := beerxml.Export(r.XML, path.Join(db.rootdir, r.File)); err != nil {
+	if err := beerxml.ExportFile(r.XML, path.Join(db.rootdir, r.File)); err != nil {
 		return -1, err
 	}
 
@@ -120,7 +120,7 @@ VALUES (?, ?, ?, ?, ?)`, r.Id, r.UserId, r.Name, r.File, r.Public)
 		return -1, err
 	}
 
-	if err := beerxml.Export(&r.XML, path.Join(db.rootdir, r.File)); err != nil {
+	if err := beerxml.ExportFile(&r.XML, path.Join(db.rootdir, r.File)); err != nil {
 		return -1, err
 	}
 

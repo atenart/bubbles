@@ -100,6 +100,7 @@ func Serve(bind string, db *db.DB, i18n *i18n.Bundle, noSignUp, debug, skipLogin
 	s.handleFunc("/account", s.account)
 	s.handleFunc("/account/save", s.saveAccount).Methods("POST")
 	s.handleFunc("/account/delete", s.deleteAccount).Methods("POST")
+	s.handleFunc("/account/export", s.exportData)
 	s.handleFunc("/inventory", s.inventory)
 	s.handleFunc("/inventory/{Action:[a-z-]+}", s.saveInventory).Methods("POST")
 	s.handleFunc("/inventory/{Action:[a-z-]+}/{Item:[0-9]+}", s.saveInventory).Methods("POST")

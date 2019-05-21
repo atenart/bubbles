@@ -18,32 +18,63 @@ package beerxml
 import (
 	"encoding/xml"
 	"fmt"
+	"io"
 	"os"
 )
 
+func Import(r io.Reader, data interface{}) error {
+	d := xml.NewDecoder(r)
+	return d.Decode(data)
+}
+
 // Open a Beer XML formated file and returns a BeerXML object.
-func Import(file string, data interface{}) error {
+func ImportFile(file string, data interface{}) error {
 	f, err := os.Open(file)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
-	d := xml.NewDecoder(f)
-	return d.Decode(data)
+	return Import(f, data)
+}
+
+func Export(data interface{}, w io.Writer) error {
+	e := xml.NewEncoder(w)
+	e.Indent("", "  ")
+	return e.Encode(data)
 }
 
 // Write a BeerXML object to a file.
-func Export(data interface{}, file string) error {
+func ExportFile(data interface{}, file string) error {
 	f, err := os.Create(file)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
-	e := xml.NewEncoder(f)
-	e.Indent("", "    ")
-	return e.Encode(data)
+	return Export(data, f)
+}
+
+// Insert an element into a BeerXML object.
+func InsertToXML(xml *BeerXML, e interface{}) error {
+	switch elmt := e.(type) {
+	case *Recipe:
+		xml.Recipes = append(xml.Recipes, *elmt)
+	case *Fermentable:
+		xml.Fermentables = append(xml.Fermentables, *elmt)
+	case *Hop:
+		xml.Hops = append(xml.Hops, *elmt)
+	case *Yeast:
+		xml.Yeasts = append(xml.Yeasts, *elmt)
+	case *Misc:
+		xml.Miscs = append(xml.Miscs, *elmt)
+	case *Water:
+		xml.Waters = append(xml.Waters, *elmt)
+	default:
+		return fmt.Errorf("Can't insert element, unknown type %T", elmt)
+	}
+
+	return nil
 }
 
 // Insert a recipe element into a Recipe object.

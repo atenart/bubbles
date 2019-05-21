@@ -16,10 +16,13 @@
 package httpserver
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/atenart/bubbles/db"
+	"github.com/atenart/bubbles/beerxml"
 )
 
 // Account page (per-user).
@@ -90,4 +93,37 @@ func (s *Server) deleteAccount(w http.ResponseWriter, r *http.Request, user *db.
 	}
 
 	s.logout(w, r)
+}
+
+// Export an user data (recipes & inventory) into a single BeerXML file.
+func (s *Server) exportData(w http.ResponseWriter, r *http.Request, user *db.User) {
+	recipes, err := s.db.GetUserRecipes(user.Id)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	ingredients, err := s.db.GetUserIngredients(user.Id)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	var xml beerxml.BeerXML
+	for _, r := range recipes {
+		beerxml.InsertToXML(&xml, r.XML)
+	}
+	for _, i := range ingredients {
+		beerxml.InsertToXML(&xml, i.XML)
+	}
+
+	w.Header().Add("Content-Type", "text/xml")
+	w.Header().Set("Content-Disposition",
+		       fmt.Sprintf("attachment; filename=bubbles_%s.xml",
+				   time.Now().UTC().Format("200601021504")))
+
+	if err := beerxml.Export(&xml, w); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
 }

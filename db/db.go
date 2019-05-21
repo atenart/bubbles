@@ -89,7 +89,7 @@ func Open(rootdir string, salt []byte) (*DB, error) {
 
 	// Retrive all beer styles.
 	var xml beerxml.BeerXML
-	if err := beerxml.Import(path.Join(rootdir, "styles.xml"), &xml); err != nil {
+	if err := beerxml.ImportFile(path.Join(rootdir, "styles.xml"), &xml); err != nil {
 		return nil, err
 	}
 
@@ -110,5 +110,5 @@ func GenToken(sz int) string {
 
 // Import a BeerXML file associated with a DB entry.
 func (db *DB) importXML(file string, XML interface{}) error {
-	return beerxml.Import(path.Join(db.rootdir, file), XML)
+	return beerxml.ImportFile(path.Join(db.rootdir, file), XML)
 }

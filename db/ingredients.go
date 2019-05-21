@@ -98,7 +98,7 @@ VALUES (?, ?, ?, ?)`, i.UserId, i.Name, i.Type, i.File)
 		return err
 	}
 
-	return beerxml.Export(i.XML, path.Join(db.rootdir, i.File))
+	return beerxml.ExportFile(i.XML, path.Join(db.rootdir, i.File))
 }
 
 // Update an ingredient.
@@ -110,7 +110,7 @@ VALUES (?, ?, ?, ?, ?)`, i.Id, i.UserId, i.Name, i.Type, i.File)
 		return err
 	}
 
-	return beerxml.Export(i.XML, path.Join(db.rootdir, i.File))
+	return beerxml.ExportFile(i.XML, path.Join(db.rootdir, i.File))
 }
 
 // Delete an ingredient.
