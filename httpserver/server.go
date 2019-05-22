@@ -33,6 +33,7 @@ type Server struct {
 	mux          *mux.Router
 	templates    *template.Template
 	cookie       *securecookie.SecureCookie
+	uploadMax    int64
 	flags        struct {
 		// Runtime options
 		signUp       bool
@@ -50,6 +51,7 @@ func Serve(bind string, db *db.DB, i18n *i18n.Bundle, noSignUp, debug, skipLogin
 		i18n:         i18n,
 		mux:          mux.NewRouter(),
 		templates:    template.New("templates"),
+		uploadMax:    10 << 20, // 10 MB
 		// FIXME: Keys are not persistent.
 		cookie:       securecookie.New(securecookie.GenerateRandomKey(64),
 					       securecookie.GenerateRandomKey(32)),
@@ -101,6 +103,7 @@ func Serve(bind string, db *db.DB, i18n *i18n.Bundle, noSignUp, debug, skipLogin
 	s.handleFunc("/account/save", s.saveAccount).Methods("POST")
 	s.handleFunc("/account/delete", s.deleteAccount).Methods("POST")
 	s.handleFunc("/account/export", s.exportData)
+	s.handleFunc("/account/import", s.importData).Methods("POST")
 	s.handleFunc("/inventory", s.inventory)
 	s.handleFunc("/inventory/{Action:[a-z-]+}", s.saveInventory).Methods("POST")
 	s.handleFunc("/inventory/{Action:[a-z-]+}/{Item:[0-9]+}", s.saveInventory).Methods("POST")

@@ -127,3 +127,77 @@ func (s *Server) exportData(w http.ResponseWriter, r *http.Request, user *db.Use
 		return
 	}
 }
+
+// Import an user data (recipes & inventory) into the DB.
+func (s *Server) importData(w http.ResponseWriter, r *http.Request, user *db.User) {
+	// Parse the POSTed form.
+	if err := r.ParseMultipartForm(s.uploadMax); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	// Retrieve the file to load.
+	file, _, err := r.FormFile("file")
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	defer file.Close()
+
+	// Try parsing it to a BeerXML object.
+	var xml beerxml.BeerXML
+	if err := beerxml.Import(file, &xml); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	// Add all the recipes.
+	for _, r := range xml.Recipes {
+		recipe := &db.Recipe{
+			Name:   r.Name,
+			UserId: user.Id,
+			XML:    &r,
+		}
+
+		if _, err := s.db.AddRecipe(recipe); err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+	}
+
+	// Add all the ingredients.
+	// We try our best, but do not report errors if the ingredient already
+	// exists in the db.
+	for _, f := range xml.Fermentables {
+		ingredient := &db.Ingredient{
+			Name:   f.Name,
+			UserId: user.Id,
+			Type:   "fermentable",
+			XML:    &f,
+		}
+
+		s.db.AddIngredient(ingredient)
+	}
+	for _, h := range xml.Hops {
+		ingredient := &db.Ingredient{
+			Name:   h.Name,
+			UserId: user.Id,
+			Type:   "hop",
+			XML:    &h,
+		}
+
+		s.db.AddIngredient(ingredient)
+	}
+	for _, y := range xml.Yeasts {
+		ingredient := &db.Ingredient{
+			Name:   y.Name,
+			UserId: user.Id,
+			Type:   "yeast",
+			XML:    &y,
+		}
+
+		s.db.AddIngredient(ingredient)
+	}
+
+	http.Redirect(w, r, "/account", 302)
+}
