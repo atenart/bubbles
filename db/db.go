@@ -62,6 +62,7 @@ CREATE TABLE IF NOT EXISTS ingredients (
 	user_id INTEGER NOT NULL,
 	name TEXT NOT NULL,
 	type TEXT NOT NULL,
+	link TEXT DEFAULT "",
 	file TEXT NOT NULL,
 	--
 	CONSTRAINT tuple UNIQUE (user_id, name, type)

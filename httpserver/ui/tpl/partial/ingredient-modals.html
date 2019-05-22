@@ -76,6 +76,14 @@
             </div>
           </div>
         </div>
+{{ if eq pageName "inventory.html" }}
+        <div class="field">
+          <label class="label" for="link">Link</label>
+          <div class="control">
+            <input class="input" type="text" id="link" name="link">
+          </div>
+        </div>
+{{ end }}
         <div class="field">
           <div class="control">
             <button class="button is-link" id="button">Add</button>
@@ -180,6 +188,14 @@
 {{ end }}
           </div>
         </div>
+{{ if eq pageName "inventory.html" }}
+        <div class="field">
+          <label class="label" for="link">Link</label>
+          <div class="control">
+            <input class="input" type="text" id="link" name="link">
+          </div>
+        </div>
+{{ end }}
         <div class="field">
           <div class="control">
             <button class="button is-link" id="button"></button>
@@ -272,6 +288,14 @@
             </div>
           </div>
         </div>
+{{ if eq pageName "inventory.html" }}
+        <div class="field">
+          <label class="label" for="link">Link</label>
+          <div class="control">
+            <input class="input" type="text" id="link" name="link">
+          </div>
+        </div>
+{{ end }}
         <div class="field">
           <div class="control">
             <button class="button is-link" id="button"></button>
@@ -379,6 +403,7 @@
     $("#modal-fermentable #amount").val($(id).data("amount"));
     $("#modal-fermentable #yield").val($(id).data("yield"));
     $("#modal-fermentable #color").val($(id).data("color"));
+    $("#modal-fermentable #link").val($(id).data("link"));
   }
 
   function fillHop(id) {
@@ -388,6 +413,7 @@
     $("#modal-hop #use").val($(id).data("use"));
     $("#modal-hop #time").val($(id).data("time"));
     $("#modal-hop #alpha").val($(id).data("alpha"));
+    $("#modal-hopyy #link").val($(id).data("link"));
   }
 
   function fillYeast(id) {
@@ -395,6 +421,7 @@
     $("#modal-yeast #form").val($(id).data("form"));
     $("#modal-yeast #amount").val($(id).data("amount"));
     $("#modal-yeast #attenuation").val($(id).data("attenuation"));
+    $("#modal-link #link").val($(id).data("link"));
 
     if (!$(id).data("amount-is-weight")) {
       $("#modal-yeast #unit").val("litre");

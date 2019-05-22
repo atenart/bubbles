@@ -27,7 +27,7 @@ import (
 func (db *DB) GetIngredient(id int64) (*Ingredient, error) {
 	var i Ingredient
 	err := db.QueryRow("SELECT * FROM ingredients WHERE id == $1", id).
-		Scan(&i.Id, &i.UserId, &i.Name, &i.Type, &i.File)
+		Scan(&i.Id, &i.UserId, &i.Name, &i.Type, &i.Link, &i.File)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func (db *DB) GetUserIngredients(uid int64) ([]*Ingredient, error) {
 	var ingredients []*Ingredient
 	for row.Next() {
 		var i Ingredient
-		row.Scan(&i.Id, &i.UserId, &i.Name, &i.Type, &i.File)
+		row.Scan(&i.Id, &i.UserId, &i.Name, &i.Type, &i.Link, &i.File)
 
 		if err := db.importIngredientXML(&i); err != nil {
 			return nil, err
@@ -92,8 +92,8 @@ func (db *DB) AddIngredient(i *Ingredient) error {
 	}
 
 	_, err = db.Exec(`
-INSERT INTO ingredients (user_id, name, type, file)
-VALUES (?, ?, ?, ?)`, i.UserId, i.Name, i.Type, i.File)
+INSERT INTO ingredients (user_id, name, type, link, file)
+VALUES (?, ?, ?, ?, ?)`, i.UserId, i.Name, i.Type, i.Link, i.File)
 	if err != nil {
 		os.Remove(i.File)
 		return err
@@ -105,8 +105,8 @@ VALUES (?, ?, ?, ?)`, i.UserId, i.Name, i.Type, i.File)
 // Update an ingredient.
 func (db *DB) UpdateIngredient(i *Ingredient) error {
 	_, err := db.Exec(`
-REPLACE INTO ingredients (id, user_id, name, type, file)
-VALUES (?, ?, ?, ?, ?)`, i.Id, i.UserId, i.Name, i.Type, i.File)
+REPLACE INTO ingredients (id, user_id, name, type, link, file)
+VALUES (?, ?, ?, ?, ?, ?)`, i.Id, i.UserId, i.Name, i.Type, i.Link, i.File)
 	if err != nil {
 		return err
 	}

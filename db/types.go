@@ -45,6 +45,7 @@ type Ingredient struct {
 	UserId int64
 	Name   string
 	Type   string
+	Link   string
 	File   string
 	XML    interface{}
 }

@@ -109,27 +109,30 @@ func (s *Server) addIngredient(r *http.Request, user *db.User, action string) er
 			return err
 		}
 
-		i.XML = &f
 		i.Name = f.Name
 		i.Type = "fermentable"
+		i.Link = r.FormValue("link")
+		i.XML = &f
 	case "add-hop":
 		var h beerxml.Hop
 		if err := formToHop(r, &h); err != nil {
 			return err
 		}
 
-		i.XML = &h
 		i.Name = h.Name
 		i.Type = "hop"
+		i.Link = r.FormValue("link")
+		i.XML = &h
 	case "add-yeast":
 		var y beerxml.Yeast
 		if err := formToYeast(r, &y); err != nil {
 			return err
 		}
 
-		i.XML = &y
 		i.Name = y.Name
 		i.Type = "yeast"
+		i.Link = r.FormValue("link")
+		i.XML = &y
 	default:
 		return fmt.Errorf("Unknown ingredient")
 	}
@@ -153,6 +156,8 @@ func (s *Server) editIngredient(r *http.Request, user *db.User, i *db.Ingredient
 	if err != nil {
 		return err
 	}
+
+	i.Link = r.FormValue("link")
 
 	return s.db.UpdateIngredient(i)
 }
