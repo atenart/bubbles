@@ -16,6 +16,7 @@
 package httpserver
 
 import (
+	"fmt"
 	"html/template"
 	"net/http"
 
@@ -89,6 +90,7 @@ func Serve(bind string, db *db.DB, i18n *i18n.Bundle, noSignUp, debug, skipLogin
 	// Install unauthenticated mux handlers.
 	s.mux.PathPrefix("/static/").Handler(
 		http.StripPrefix("/static/", http.FileServer(http.Dir("httpserver/ui/static"))))
+	s.mux.HandleFunc("/robots.txt", s.robotstxt)
 	s.mux.HandleFunc("/sign-up", s.signUp).Methods("POST")
 	s.mux.HandleFunc("/activate/{Token:[a-zA-Z0-9]+}", s.activate)
 	s.mux.HandleFunc("/login", s.login).Methods("POST")
@@ -194,4 +196,11 @@ func (s *Server) executeTemplate(w http.ResponseWriter, user *db.User, name stri
 	}
 
 	clone.ExecuteTemplate(w, name, data)
+}
+
+func (s *Server) robotstxt(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, `User-agent: *
+Allow: /$
+Disallow: /
+`)
 }
