@@ -5,7 +5,7 @@
 <section class="section">
   <div class="container">
     <h1 class="title is-4">{{ L "Modify account" }}</h1>
-    <form action="/account/save" method="post">
+    <form action="/account/save" method="post" autocomplete="off">
       {{ .CSRF }}
 
       <div class="field is-horizontal">

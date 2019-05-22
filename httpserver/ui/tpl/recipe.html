@@ -6,7 +6,7 @@
 
 <section class="section" id="recipe">
   <div class="container">
-    <form action="/recipe/{{ .Recipe.Id }}/save" method="post">
+    <form action="/recipe/{{ .Recipe.Id }}/save" method="post" autocomplete="off">
       {{ .CSRF }}
 
       <div class="columns">
@@ -315,7 +315,7 @@
       </button>
     </header>
     <section class="modal-card-body">
-      <form method="post">
+      <form method="post" autocomplete="off">
         {{ .CSRF }}
         <div class="field is-horizontal">
           <div class="field-body">
