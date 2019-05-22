@@ -2,17 +2,19 @@
 
 {{ template "navigation.html" }}
 
+<form method="post" id="form-actions"></form>
+
 <section class="section">
   <div class="container">
     <h1 class="title is-4">{{ L "Ingredients inventory" }}</h1>
     <a class="button is-light" onclick="showFermentable('/inventory');">
-      Add fermentable
+      {{ L "Add fermentable" }}
     </a>
     <a class="button is-light" onclick="showHop('/inventory');">
-      Add hop
+      {{ L "Add hop" }}
     </a>
     <a class="button is-light" onclick="showYeast('/inventory');">
-      Add yeast
+      {{ L "Add yeast" }}
     </a>
     <table class="table is-hoverable is-fullwidth">
       <thead>
@@ -21,7 +23,7 @@
           <th>{{ L "Name" }}</th>
           <th>{{ L "Type / Form" }}</th>
           <th>{{ L "Amount" }}</th>
-          <th class="has-text-right-desktop">Actions</th>
+          <th class="has-text-right-desktop">{{ L "Actions" }}</th>
         </tr>
       </thead>
       <tbody>
@@ -39,7 +41,8 @@
             <a class="button is-small" title="Edit" onclick="editFermentable('/inventory' ,'#fermentable-{{ .Id }}')">
               <span class="icon is-small"><i class="fas fa-edit"></i></span>
             </a>
-            <button class="button is-small" title="Delete" formaction="/inventory/del/{{ .Id }}">
+            <button class="button is-small" title="Delete"
+                form="form-actions" formaction="/inventory/del/{{ .Id }}">
               <span class="icon is-small"><i class="fas fa-trash"></i></span>
             </button>
           </td>
@@ -56,7 +59,8 @@
             <a class="button is-small" title="Edit" onclick="editHop('/inventory' ,'#hop-{{ .Id }}')">
               <span class="icon is-small"><i class="fas fa-edit"></i></span>
             </a>
-            <button class="button is-small" title="Delete" formaction="/inventory/del/{{ .Id }}">
+            <button class="button is-small" title="Delete"
+                form="form-actions" formaction="/inventory/del/{{ .Id }}">
               <span class="icon is-small"><i class="fas fa-trash"></i></span>
             </button>
           </td>
@@ -73,7 +77,8 @@
             <a class="button is-small" title="Edit" onclick="editYeast('/inventory' ,'#yeast-{{ .Id }}')">
               <span class="icon is-small"><i class="fas fa-edit"></i></span>
             </a>
-            <button class="button is-small" title="Delete" formaction="/inventory/del/{{ .Id }}">
+            <button class="button is-small" title="Delete"
+                form="form-actions" formaction="/inventory/del/{{ .Id }}">
               <span class="icon is-small"><i class="fas fa-trash"></i></span>
             </button>
           </td>

@@ -2,6 +2,8 @@
 
 {{ template "navigation.html" }}
 
+<form method="post" id="form-actions"></form>
+
 <section class="section" id="recipe">
   <div class="container">
     <form action="/recipe/{{ .Recipe.Id }}/save" method="post">
@@ -175,7 +177,8 @@
               <a class="button is-small" title="Edit" onclick="editFermentable('/recipe/{{ $.Recipe.Id }}' ,'#fermentable-{{ $k }}')">
                 <span class="icon is-small"><i class="fas fa-edit"></i></span>
               </a>
-              <button class="button is-small" title="Delete" formaction="/recipe/{{ $.Recipe.Id }}/del-fermentable/{{ $k }}">
+              <button class="button is-small" title="Delete"
+                  form="form-actions" formaction="/recipe/{{ $.Recipe.Id }}/del-fermentable/{{ $k }}">
                 <span class="icon is-small"><i class="fas fa-trash"></i></span>
               </button>
             </td>
@@ -198,7 +201,8 @@
               <a class="button is-small" title="Edit" onclick="editHop('/recipe/{{ $.Recipe.Id }}', '#hop-{{ $k }}')">
                 <span class="icon is-small"><i class="fas fa-edit"></i></span>
               </a>
-              <button class="button is-small" title="Delete" formaction="/recipe/{{ $.Recipe.Id }}/del-hop/{{ $k }}">
+              <button class="button is-small" title="Delete"
+                  form="form-actions" formaction="/recipe/{{ $.Recipe.Id }}/del-hop/{{ $k }}">
                 <span class="icon is-small"><i class="fas fa-trash"></i></span>
               </button>
             </td>
@@ -221,7 +225,8 @@
               <a class="button is-small" title="Edit" onclick="editYeast('/recipe/{{ $.Recipe.Id }}', '#yeast-{{ $k }}')">
                 <span class="icon is-small"><i class="fas fa-edit"></i></span>
               </a>
-              <button class="button is-small" title="Delete" formaction="/recipe/{{ $.Recipe.Id }}/del-yeast/{{ $k }}">
+              <button class="button is-small" title="Delete"
+                  form="form-actions" formaction="/recipe/{{ $.Recipe.Id }}/del-yeast/{{ $k }}">
                 <span class="icon is-small"><i class="fas fa-trash"></i></span>
               </button>
             </td>
@@ -259,7 +264,8 @@
               <a class="button is-small" title="Edit" onclick="editMashStep('#mash-step-{{ $k }}')">
                 <span class="icon is-small"><i class="fas fa-edit"></i></span>
               </a>
-              <button class="button is-small" title="Delete" formaction="/recipe/{{ $.Recipe.Id }}/del-mash-step/{{ $k }}">
+              <button class="button is-small" title="Delete"
+                  form="form-actions" formaction="/recipe/{{ $.Recipe.Id }}/del-mash-step/{{ $k }}">
                 <span class="icon is-small"><i class="fas fa-trash"></i></span>
               </button>
             </td>
