@@ -17,12 +17,14 @@ package httpserver
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 	"strconv"
 
+	"github.com/gorilla/csrf"
+	"github.com/gorilla/mux"
 	"github.com/atenart/bubbles/db"
 	"github.com/atenart/bubbles/beerxml"
-	"github.com/gorilla/mux"
 )
 
 // Inventory page (per-user).
@@ -36,9 +38,11 @@ func (s *Server) inventory(w http.ResponseWriter, r *http.Request, user *db.User
 	sort(ingredients)
 
 	s.executeTemplate(w, user, "inventory.html", struct{
+		CSRF        template.HTML
 		Title	    string
 		Ingredients []*db.Ingredient
 	}{
+		csrf.TemplateField(r),
 		"Bubbles - inventory",
 		ingredients,
 	})

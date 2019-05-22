@@ -19,6 +19,7 @@ import (
 	"html/template"
 	"net/http"
 
+	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/securecookie"
 
@@ -91,7 +92,7 @@ func Serve(bind string, db *db.DB, i18n *i18n.Bundle, noSignUp, debug, skipLogin
 	s.mux.HandleFunc("/sign-up", s.signUp).Methods("POST")
 	s.mux.HandleFunc("/activate/{Token:[a-zA-Z0-9]+}", s.activate)
 	s.mux.HandleFunc("/login", s.login).Methods("POST")
-	s.mux.HandleFunc("/logout", s.logout).Methods("POST")
+	s.mux.HandleFunc("/logout", s.logout)
 
 	// Install authenticated mux handlers.
 	s.handleFunc("/", s.index)
@@ -108,8 +109,12 @@ func Serve(bind string, db *db.DB, i18n *i18n.Bundle, noSignUp, debug, skipLogin
 	s.handleFunc("/inventory/{Action:[a-z-]+}", s.saveInventory).Methods("POST")
 	s.handleFunc("/inventory/{Action:[a-z-]+}/{Item:[0-9]+}", s.saveInventory).Methods("POST")
 
+	// Instantiate the CSRF protection.
+	rf := csrf.Protect(securecookie.GenerateRandomKey(32),
+			   csrf.Secure(!s.flags.debug))
+
 	// Start serving over HTTP.
-	return http.ListenAndServe(bind, s.mux)
+	return http.ListenAndServe(bind, rf(s.mux))
 }
 
 // Mux HandleFunc wrapper.
@@ -133,14 +138,14 @@ func (s *Server) sessionHandler(fn func(http.ResponseWriter, *http.Request, *db.
 		// Check if a session cookie is available.
 		cookie, err := r.Cookie("session")
 		if err != nil {
-			s.loginPage(w)
+			s.loginPage(w, r)
 			return
 		}
 
 		// Try getting the uid out of the session cookie.
 		var uid int64
 		if err = s.cookie.Decode("session", cookie.Value, &uid); err != nil {
-			s.loginPage(w)
+			s.loginPage(w, r)
 			return
 		}
 
@@ -156,10 +161,12 @@ func (s *Server) sessionHandler(fn func(http.ResponseWriter, *http.Request, *db.
 	}
 }
 
-func (s *Server) loginPage(w http.ResponseWriter) {
+func (s *Server) loginPage(w http.ResponseWriter, r *http.Request) {
 	s.executeTemplate(w, nil, "login.html", struct{
+		CSRF   template.HTML
 		SignUp bool
 	}{
+		csrf.TemplateField(r),
 		s.flags.signUp,
 	})
 }

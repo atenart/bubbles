@@ -2,11 +2,12 @@
 
 {{ template "navigation.html" }}
 
-<form method="post" id="form-actions"></form>
+<form method="post" id="form-actions">{{ .CSRF }}</form>
 
 <section class="section" id="recipe">
   <div class="container">
     <form action="/recipe/{{ .Recipe.Id }}/save" method="post">
+      {{ .CSRF }}
 
       <div class="columns">
         <div class="column is-two-thirds">
@@ -293,6 +294,7 @@
         "<strong>{{ .Recipe.Name }}</strong>" will be deleted.
       </p><br />
       <form action="/recipe/{{ .Recipe.Id }}/delete" method="post">
+        {{ .CSRF }}
         <button class="button is-danger">Yes, delete</button>
         <a class="button is-light" onclick="hideModal('delete');">
           No, keep
@@ -314,6 +316,7 @@
     </header>
     <section class="modal-card-body">
       <form method="post">
+        {{ .CSRF }}
         <div class="field is-horizontal">
           <div class="field-body">
             <div class="field">

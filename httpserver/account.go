@@ -17,10 +17,12 @@ package httpserver
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 	"strings"
 	"time"
 
+	"github.com/gorilla/csrf"
 	"github.com/atenart/bubbles/db"
 	"github.com/atenart/bubbles/beerxml"
 )
@@ -28,10 +30,12 @@ import (
 // Account page (per-user).
 func (s *Server) account(w http.ResponseWriter, r *http.Request, user *db.User) {
 	s.executeTemplate(w, user, "account.html", struct{
+		CSRF	template.HTML
 		Title	string
 		User    *db.User
 		Tags    []string
 	}{
+		csrf.TemplateField(r),
 		"Bubbles - account",
 		user,
 		s.i18n.Tags(),

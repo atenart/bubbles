@@ -2,7 +2,7 @@
 
 {{ template "navigation.html" }}
 
-<form method="post" id="form-actions"></form>
+<form method="post" id="form-actions">{{ .CSRF }}</form>
 
 <section class="section">
   <div class="container">

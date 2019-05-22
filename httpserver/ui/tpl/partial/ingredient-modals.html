@@ -8,6 +8,7 @@
     </header>
     <section class="modal-card-body">
       <form method="post">
+        {{ .CSRF }}
 {{ if eq pageName "recipe.html" }}
 {{ if .Fermentables }}
         <div class="field is-horizontal">
@@ -104,6 +105,7 @@
     </header>
     <section class="modal-card-body">
       <form method="post">
+        {{ .CSRF }}
 {{ if eq pageName "recipe.html" }}
 {{ if .Hops }}
         <div class="field is-horizontal">
@@ -216,6 +218,7 @@
     </header>
     <section class="modal-card-body">
       <form method="post">
+        {{ .CSRF }}
 {{ if eq pageName "recipe.html" }}
 {{ if .Yeasts }}
         <div class="field is-horizontal">
@@ -296,72 +299,6 @@
           </div>
         </div>
 {{ end }}
-        <div class="field">
-          <div class="control">
-            <button class="button is-link" id="button"></button>
-          </div>
-        </div>
-      </form>
-    </section>
-  </div>
-</div>
-
-<div class="modal" id="modal-mash-step">
-  <div class="modal-background"></div>
-  <div class="modal-card">
-    <header class="modal-card-head">
-      <p class="modal-card-title" id="title"></p>
-      <button class="delete" aria-label="close" onclick="hideModal('mash-step');">
-      </button>
-    </header>
-    <section class="modal-card-body">
-      <form method="post">
-        <div class="field is-horizontal">
-          <div class="field-body">
-            <div class="field">
-              <label class="label" for="name">Name</label>
-              <div class="control">
-                <input class="input" type="text" id="name" name="name">
-              </div>
-            </div>
-            <div class="field">
-              <label class="label">Type</label>
-              <div class="control">
-                <div class="select is-fullwidth">
-                  <select name="type" id="type">
-                    <option value="Temperature">Temperature</option>
-                    <!--<option value="Infusion">Infusion</option>-->
-                    <option value="Decoction">Decoction</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-            <!--
-            <div class="field">
-              <label class="label" for="infusion_amount">Infuse amount</label>
-              <div class="control">
-                <input class="input" type="number" id="infuse_amount" name="infuse_amount">
-              </div>
-            </div>
-            -->
-          </div>
-        </div>
-        <div class="field is-horizontal">
-          <div class="field-body">
-            <div class="field">
-              <label class="label" for="temperature">Temperature (°C)</label>
-              <div class="control">
-                <input class="input" type="number" id="temperature" name="temperature">
-              </div>
-            </div>
-            <div class="field">
-              <label class="label" for="time">Time (m)</label>
-              <div class="control">
-                <input class="input" type="number" id="time" name="time">
-              </div>
-            </div>
-          </div>
-        </div>
         <div class="field">
           <div class="control">
             <button class="button is-link" id="button"></button>

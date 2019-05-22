@@ -22,9 +22,10 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gorilla/csrf"
+	"github.com/gorilla/mux"
 	"github.com/atenart/bubbles/beerxml"
 	"github.com/atenart/bubbles/db"
-	"github.com/gorilla/mux"
 )
 
 // Return a *db.Recipe object, from the database if it exists or new if it
@@ -81,6 +82,7 @@ func (s *Server) recipe(w http.ResponseWriter, r *http.Request, user *db.User) {
 	}
 
 	s.executeTemplate(w, user, "recipe.html", struct{
+		CSRF         template.HTML
 		Title        string
 		User         *db.User
 		Recipe       *db.Recipe
@@ -90,6 +92,7 @@ func (s *Server) recipe(w http.ResponseWriter, r *http.Request, user *db.User) {
 		Hops         []*beerxml.Hop
 		Yeasts       []*beerxml.Yeast
 	}{
+		csrf.TemplateField(r),
 		fmt.Sprintf("Bubbles - recipe/%s", recipe.Name),
 		user,
 		recipe,

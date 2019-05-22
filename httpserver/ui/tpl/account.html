@@ -6,6 +6,7 @@
   <div class="container">
     <h1 class="title is-4">{{ L "Modify account" }}</h1>
     <form action="/account/save" method="post">
+      {{ .CSRF }}
 
       <div class="field is-horizontal">
         <div class="field-body">
@@ -86,6 +87,7 @@
         will be permanently deleted. This includes all your recipes.
       </p><br />
       <form action="/account/delete" method="post">
+        {{ .CSRF }}
         <button class="button is-danger">Yes, delete</button>
         <a class="button is-light" onclick="hideModal('delete');">
           Cancel
@@ -139,6 +141,7 @@
     </header>
     <section class="modal-card-body">
       <form action="/account/import" method="post" enctype="multipart/form-data">
+        {{ .CSRF }}
         <div class="field is-horizontal">
           <div class="field-body">
             <div class="field">
