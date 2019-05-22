@@ -95,6 +95,7 @@ func (db *DB) AddIngredient(i *Ingredient) error {
 INSERT INTO ingredients (user_id, name, type, file)
 VALUES (?, ?, ?, ?)`, i.UserId, i.Name, i.Type, i.File)
 	if err != nil {
+		os.Remove(i.File)
 		return err
 	}
 

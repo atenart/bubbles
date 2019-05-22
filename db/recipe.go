@@ -95,6 +95,7 @@ func (db *DB) AddRecipe(r *Recipe) (int64, error) {
 INSERT INTO recipes (user_id, name, file, public)
 VALUES (?, ?, ?, ?)`, r.UserId, r.Name, r.File, r.Public)
 	if err != nil {
+		os.Remove(r.File)
 		return -1, err
 	}
 
