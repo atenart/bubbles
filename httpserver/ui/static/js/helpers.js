@@ -12,6 +12,19 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with this program. If not, see <https://www.gnu.org/licenses/>.
+//
+
+$(function() {
+  // Retrieve the anchor to display.
+  var anchor = window.top.location.hash.substr(1);
+
+  // Check the anchor exists.
+  if (anchor.length == 0 || $("#modal-" + anchor).length == 0)
+    return;
+
+  // Display the anchor.
+  $(`#modal-${anchor}`).addClass("is-active");
+})
 
 function showModal(id) {
   $(`#modal-${id} form`)[0].reset();

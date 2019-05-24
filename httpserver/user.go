@@ -16,6 +16,7 @@
 package httpserver
 
 import (
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -56,9 +57,14 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 
 	// Try retrieving an (enabled) existing user.
 	user, err := s.db.GetUserByEmail(email)
-	if err != nil || !user.Enabled {
-		// TODO: give a meaningfull feedback to the user.
+	if err != nil {
 		http.Redirect(w, r, "/", 302)
+		return
+	}
+
+	// Check the user is enabled.
+	if !user.Enabled {
+		http.Redirect(w, r, "/#activate", 302)
 		return
 	}
 
@@ -131,8 +137,30 @@ func (s *Server) signUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// TODO: send an email with the activation link & give user feedack.
-	http.Redirect(w, r, "/", 302)
+	// If verification is not enabled, we can go directly to the login page.
+	if !s.flags.verification {
+		http.Redirect(w, r, "/", 302)
+		return
+	}
+
+	// Send the activation link by mail.
+	err = s.sendmail.Send(email, "Bubbles account verification",
+			      fmt.Sprintf(`Hello,
+
+You signed up for an account on Bubbles. In order to enable it, please follow
+this link:
+
+%s/activate/%s
+
+Once activated, you can sign-in and start making beer recipes :)
+
+— Cheers`, s.URL, token))
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	http.Redirect(w, r, "/#activate", 302)
 }
 
 // Activates an user if the provided token in the url matches.

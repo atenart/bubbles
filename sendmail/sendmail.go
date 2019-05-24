@@ -36,10 +36,12 @@ func Init(remote, sender string) *Sendmail {
 
 // Send a mail to an user.
 func (m *Sendmail) Send(recipient, subject, body string) error {
+	serverName := strings.Split(m.Remote, ":")[0]
+
 	// Start a new TLS connection.
 	tlsconfig := &tls.Config {
 		InsecureSkipVerify: true,
-		ServerName: m.Remote,
+		ServerName: serverName,
 	}
 	conn, err := tls.Dial("tcp", m.Remote, tlsconfig)
 	if err != nil {
@@ -48,7 +50,7 @@ func (m *Sendmail) Send(recipient, subject, body string) error {
 	defer conn.Close()
 
 	// Start a connection to the remote SMTP server.
-	c, err := smtp.NewClient(conn, strings.Split(m.Remote, ":")[0])
+	c, err := smtp.NewClient(conn, serverName)
 	if err != nil {
 		return err
 	}

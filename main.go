@@ -17,6 +17,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"log"
 
 	"github.com/atenart/bubbles/db"
@@ -26,18 +27,24 @@ import (
 )
 
 var (
-	bind       = flag.String("bind", ":8000", "Address and port to bind to.")
-	data       = flag.String("data", "data/", "Path to the data (will contain the db file as well).")
-	noSignUp   = flag.Bool("no-signup", false, "Disable registration of new users.")
-	smtpServer = flag.String("smtp-server", "localhost:25", "SMTP server address and port.")
-	sender     = flag.String("email-from", "no-reply@bubbles", "Sender e-mail to use.")
+	bind           = flag.String("bind", ":8000", "Address and port to bind to.")
+	url            = flag.String("url", "", "Website URL (with protocol).")
+	data           = flag.String("data", "data/", "Path to the data (will contain the db file as well).")
+	noSignUp       = flag.Bool("no-signup", false, "Disable registration of new users.")
+	noVerification = flag.Bool("no-verification", false, "Disable verification of sign-up (no email will be sent).")
+	smtpServer     = flag.String("smtp-server", "localhost:587", "SMTP server address and port.")
+	sender         = flag.String("email-from", "no-reply@bubbles", "Sender e-mail to use.")
 	// Development options
-	debug      = flag.Bool("debug", false, "Launch in debug mode.")
-	skipLogin  = flag.Bool("skip-login", false, "Skip login and force uid to 1.")
+	debug          = flag.Bool("debug", false, "Launch in debug mode.")
+	skipLogin      = flag.Bool("skip-login", false, "Skip login and force uid to 1.")
 )
 
 func main() {
 	flag.Parse()
+
+	if *url == "" {
+		*url = fmt.Sprintf("http://%s", *bind)
+	}
 
 	// FIXME: salt.
 	db, err := db.Open(*data, []byte{0xc9, 0x16, 0x50, 0xff, 0x01, 0x8c, 0xe1, 0x0a})
@@ -53,6 +60,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Fatal(httpserver.Serve(*bind, db, sendmail, i18n,
-				   *noSignUp, *debug, *skipLogin))
+	log.Fatal(httpserver.Serve(*bind, *url, db, sendmail, i18n,
+				   *noSignUp, *noVerification, *debug, *skipLogin))
 }

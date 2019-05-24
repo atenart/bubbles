@@ -30,6 +30,7 @@ import (
 
 // Represents a server instance (there is usually a single one).
 type Server struct {
+	URL          string
 	db           *db.DB
 	sendmail     *sendmail.Sendmail
 	i18n         *i18n.Bundle
@@ -48,9 +49,10 @@ type Server struct {
 }
 
 // Starts a new server instance.
-func Serve(bind string, db *db.DB, sendmail *sendmail.Sendmail, i18n *i18n.Bundle,
-	   noSignUp, debug, skipLogin bool) error {
+func Serve(bind, url string, db *db.DB, sendmail *sendmail.Sendmail, i18n *i18n.Bundle,
+	   noSignUp, noVerification, debug, skipLogin bool) error {
 	s := &Server{
+		URL:          url,
 		db:           db,
 		sendmail:     sendmail,
 		i18n:         i18n,
@@ -63,8 +65,7 @@ func Serve(bind string, db *db.DB, sendmail *sendmail.Sendmail, i18n *i18n.Bundl
 	}
 
 	s.flags.signUp = !noSignUp
-	// Not supported yet.
-	s.flags.verification = false
+	s.flags.verification = !noVerification
 	s.flags.debug = debug
 	s.flags.skipLogin = skipLogin
 
@@ -170,11 +171,13 @@ func (s *Server) sessionHandler(fn func(http.ResponseWriter, *http.Request, *db.
 
 func (s *Server) loginPage(w http.ResponseWriter, r *http.Request) {
 	s.executeTemplate(w, nil, "login.html", struct{
-		CSRF   template.HTML
-		SignUp bool
+		CSRF         template.HTML
+		SignUp       bool
+		Verification bool
 	}{
 		csrf.TemplateField(r),
 		s.flags.signUp,
+		s.flags.verification,
 	})
 }
 

@@ -107,7 +107,7 @@ func (db *DB) DeleteUser(u *User) error {
 	}
 
 	// Now, delete the user itself. Do this at the end: if something went
-	// bad, the user can still log in to report the issue.
+	// bad, the user can still sign in to report the issue.
 	if _, err := db.Exec("DELETE FROM users WHERE id == ?", u.Id); err != nil {
 		return err
 	}

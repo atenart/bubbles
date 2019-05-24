@@ -48,6 +48,37 @@
 </footer>
 
 </div>
+
+<div class="modal" id="modal-activate">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title" id="title">
+{{ if .Verification }}
+        Activate your account
+{{ else }}
+        Success
+{{ end }}
+      </p>
+      <button class="delete" aria-label="close" onclick="hideModal('activate');">
+      </button>
+    </header>
+    <section class="modal-card-body">
+      <p>
+        Your  account was successfully created.
+{{ if .Verification }}
+        In order to activate it, you should have received an email with an
+        activation link.
+        <br /><br />
+        See you soon!
+{{ else }}
+        You can now sign in.
+{{ end }}
+      </p>
+    </section>
+  </div>
+</div>
+
 </div>
 </body>
 </html>
