@@ -170,6 +170,11 @@ func (s *Server) sessionHandler(fn func(http.ResponseWriter, *http.Request, *db.
 }
 
 func (s *Server) loginPage(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		http.Redirect(w, r, "/", 302)
+		return
+	}
+
 	s.executeTemplate(w, nil, "login.html", struct{
 		CSRF         template.HTML
 		SignUp       bool
