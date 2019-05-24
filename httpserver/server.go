@@ -23,14 +23,15 @@ import (
 	"github.com/gorilla/csrf"
 	"github.com/gorilla/mux"
 	"github.com/gorilla/securecookie"
-
 	"github.com/atenart/bubbles/db"
 	"github.com/atenart/bubbles/i18n"
+	"github.com/atenart/bubbles/sendmail"
 )
 
 // Represents a server instance (there is usually a single one).
 type Server struct {
 	db           *db.DB
+	sendmail     *sendmail.Sendmail
 	i18n         *i18n.Bundle
 	mux          *mux.Router
 	templates    *template.Template
@@ -47,9 +48,11 @@ type Server struct {
 }
 
 // Starts a new server instance.
-func Serve(bind string, db *db.DB, i18n *i18n.Bundle, noSignUp, debug, skipLogin bool) error {
+func Serve(bind string, db *db.DB, sendmail *sendmail.Sendmail, i18n *i18n.Bundle,
+	   noSignUp, debug, skipLogin bool) error {
 	s := &Server{
 		db:           db,
+		sendmail:     sendmail,
 		i18n:         i18n,
 		mux:          mux.NewRouter(),
 		templates:    template.New("templates"),

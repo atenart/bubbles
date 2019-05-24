@@ -22,14 +22,18 @@ import (
 	"github.com/atenart/bubbles/db"
 	"github.com/atenart/bubbles/httpserver"
 	"github.com/atenart/bubbles/i18n"
+	"github.com/atenart/bubbles/sendmail"
 )
 
 var (
-	bind      = flag.String("bind", ":8000", "Address and port to bind to.")
-	data      = flag.String("data", "data/", "Path to the data (will contain the db file as well).")
-	noSignUp  = flag.Bool("no-signup", false, "Disable registration of new users.")
-	debug     = flag.Bool("debug", false, "Launch in debug mode.")
-	skipLogin = flag.Bool("skip-login", false, "Skip login and force uid to 1.")
+	bind       = flag.String("bind", ":8000", "Address and port to bind to.")
+	data       = flag.String("data", "data/", "Path to the data (will contain the db file as well).")
+	noSignUp   = flag.Bool("no-signup", false, "Disable registration of new users.")
+	smtpServer = flag.String("smtp-server", "localhost:25", "SMTP server address and port.")
+	sender     = flag.String("email-from", "no-reply@bubbles", "Sender e-mail to use.")
+	// Development options
+	debug      = flag.Bool("debug", false, "Launch in debug mode.")
+	skipLogin  = flag.Bool("skip-login", false, "Skip login and force uid to 1.")
 )
 
 func main() {
@@ -42,10 +46,13 @@ func main() {
 	}
 	defer db.Close()
 
+	sendmail := sendmail.Init(*smtpServer, *sender)
+
 	i18n, err := i18n.Init()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Fatal(httpserver.Serve(*bind, db, i18n, *noSignUp, *debug, *skipLogin))
+	log.Fatal(httpserver.Serve(*bind, db, sendmail, i18n,
+				   *noSignUp, *debug, *skipLogin))
 }
