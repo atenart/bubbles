@@ -139,7 +139,7 @@ func (s *Server) signUp(w http.ResponseWriter, r *http.Request) {
 
 	// If verification is not enabled, we can go directly to the login page.
 	if !s.flags.verification {
-		http.Redirect(w, r, "/", 302)
+		http.Redirect(w, r, "/#activate", 302)
 		return
 	}
 
