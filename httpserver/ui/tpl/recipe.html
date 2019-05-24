@@ -90,10 +90,13 @@
               <div class="field">
                 <div class="control">
                   <button class="button is-primary">
-                    Save changes
+                    {{ L "Save changes" }}
                   </button>
+                  <a class="button is-info" href="/recipe/clone/{{ .Recipe.Id }}">
+                    {{ L "Clone" }}
+                  </a>
                   <a class="button is-danger" onclick="showModal('delete');">
-                    Delete recipe
+                    {{ L "Delete recipe" }}
                   </a>
                 </div>
               </div>

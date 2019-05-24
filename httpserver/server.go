@@ -99,6 +99,7 @@ func Serve(bind string, db *db.DB, i18n *i18n.Bundle, noSignUp, debug, skipLogin
 	// Install authenticated mux handlers.
 	s.handleFunc("/", s.index)
 	s.handleFunc("/recipe/new", s.newRecipe)
+	s.handleFunc("/recipe/clone/{Id:[0-9]+}", s.cloneRecipe)
 	s.handleFunc("/recipe/{Id:[0-9]+}", s.recipe)
 	s.handleFunc("/recipe/{Id:[0-9]+}/{Action:[a-z-]+}", s.saveRecipe).Methods("POST")
 	s.handleFunc("/recipe/{Id:[0-9]+}/{Action:[a-z-]+}/{Item:[0-9]+}", s.saveRecipe).Methods("POST")
@@ -112,6 +113,7 @@ func Serve(bind string, db *db.DB, i18n *i18n.Bundle, noSignUp, debug, skipLogin
 	s.handleFunc("/inventory/{Action:[a-z-]+}/{Item:[0-9]+}", s.saveInventory).Methods("POST")
 
 	// Instantiate the CSRF protection.
+	// TODO: persistent key.
 	rf := csrf.Protect(securecookie.GenerateRandomKey(32),
 			   csrf.Secure(!s.flags.debug))
 

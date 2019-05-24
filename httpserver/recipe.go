@@ -239,6 +239,36 @@ func (s *Server) newRecipe(w http.ResponseWriter, r *http.Request, user *db.User
 	http.Redirect(w, r, fmt.Sprintf("/recipe/%d", id), 302)
 }
 
+// Clone an existing recipe.
+func (s *Server) cloneRecipe(w http.ResponseWriter, r *http.Request, user *db.User) {
+	id, err := strconv.ParseInt(mux.Vars(r)["Id"], 10, 64)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	// Retrieve the recipe current info.
+	recipe, err := s.getRecipe(id, user.Id)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	// Update name & version.
+	recipe.Name = fmt.Sprintf("%s (cloned)", recipe.Name)
+	recipe.XML.Name = recipe.Name
+	recipe.XML.Version += 1;
+
+	// Save or update recipe.
+	clone, err := s.db.AddRecipe(recipe)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/recipe/%d", clone), 302)
+}
+
 // Save a recipe.
 func (s *Server) saveRecipe(w http.ResponseWriter, r *http.Request, user *db.User) {
 	id, err := strconv.ParseInt(mux.Vars(r)["Id"], 10, 64)
