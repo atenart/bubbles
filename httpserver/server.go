@@ -59,9 +59,6 @@ func Serve(bind, url string, db *db.DB, sendmail *sendmail.Sendmail, i18n *i18n.
 		mux:          mux.NewRouter(),
 		templates:    template.New("templates"),
 		uploadMax:    10 << 20, // 10 MB
-		// FIXME: Keys are not persistent.
-		cookie:       securecookie.New(securecookie.GenerateRandomKey(64),
-					       securecookie.GenerateRandomKey(32)),
 	}
 
 	s.flags.signUp = !noSignUp
@@ -116,10 +113,12 @@ func Serve(bind, url string, db *db.DB, sendmail *sendmail.Sendmail, i18n *i18n.
 	s.handleFunc("/inventory/{Action:[a-z-]+}", s.saveInventory).Methods("POST")
 	s.handleFunc("/inventory/{Action:[a-z-]+}/{Item:[0-9]+}", s.saveInventory).Methods("POST")
 
+	// Setup secure cookie.
+	s.cookie = securecookie.New(s.db.LoadKey("hash.securecookie", 64),
+				    s.db.LoadKey("block.securecookie", 32))
+
 	// Instantiate the CSRF protection.
-	// TODO: persistent key.
-	rf := csrf.Protect(securecookie.GenerateRandomKey(32),
-			   csrf.Secure(!s.flags.debug))
+	rf := csrf.Protect(s.db.LoadKey("csrf", 32), csrf.Secure(!s.flags.debug))
 
 	// Start serving over HTTP.
 	return http.ListenAndServe(bind, rf(s.mux))

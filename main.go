@@ -46,8 +46,7 @@ func main() {
 		*url = fmt.Sprintf("http://%s", *bind)
 	}
 
-	// FIXME: salt.
-	db, err := db.Open(*data, []byte{0xc9, 0x16, 0x50, 0xff, 0x01, 0x8c, 0xe1, 0x0a})
+	db, err := db.Open(*data)
 	if err != nil {
 		log.Fatal(err)
 	}

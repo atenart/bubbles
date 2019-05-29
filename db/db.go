@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS ingredients (
 }
 
 // Open a database, and create it if it does not exists.
-func Open(rootdir string, salt []byte) (*DB, error) {
+func Open(rootdir string) (*DB, error) {
 	db, err := sql.Open("sqlite3", path.Join(rootdir, "bubbles.db"))
 	if err != nil {
 		return nil, err
@@ -94,7 +94,10 @@ func Open(rootdir string, salt []byte) (*DB, error) {
 		return nil, err
 	}
 
-	return &DB{ db, &xml.Styles, rootdir, salt }, nil
+	d := &DB{ db, &xml.Styles, rootdir, nil }
+	d.salt = d.LoadKey("salt.db", 64)
+
+	return d, nil
 }
 
 // Token charset.
