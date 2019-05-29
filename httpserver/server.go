@@ -44,13 +44,12 @@ type Server struct {
 		verification bool
 		// Debugging options
 		debug        bool
-		skipLogin    bool
 	}
 }
 
 // Starts a new server instance.
 func Serve(bind, url string, db *db.DB, sendmail *sendmail.Sendmail, i18n *i18n.Bundle,
-	   noSignUp, noVerification, debug, skipLogin bool) error {
+	   noSignUp, noVerification, debug  bool) error {
 	s := &Server{
 		URL:          url,
 		db:           db,
@@ -64,7 +63,6 @@ func Serve(bind, url string, db *db.DB, sendmail *sendmail.Sendmail, i18n *i18n.
 	s.flags.signUp = !noSignUp
 	s.flags.verification = !noVerification
 	s.flags.debug = debug
-	s.flags.skipLogin = skipLogin
 
 	// i18n: add dummy L function, will be overriden before serving the
 	// templates.
@@ -132,16 +130,6 @@ func (s *Server) handleFunc(path string, handler func(http.ResponseWriter, *http
 // HTTP handler wrapper for user session enforcement.
 func (s *Server) sessionHandler(fn func(http.ResponseWriter, *http.Request, *db.User)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if s.flags.skipLogin {
-			user, err := s.db.GetUserById(1)
-			if err != nil {
-				http.Error(w, err.Error(), 500)
-				return
-			}
-			fn(w, r, user)
-			return
-		}
-
 		// Check if a session cookie is available.
 		cookie, err := r.Cookie("session")
 		if err != nil {

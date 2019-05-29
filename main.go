@@ -36,7 +36,6 @@ var (
 	sender         = flag.String("email-from", "no-reply@bubbles", "Sender e-mail to use.")
 	// Development options
 	debug          = flag.Bool("debug", false, "Launch in debug mode.")
-	skipLogin      = flag.Bool("skip-login", false, "Skip login and force uid to 1.")
 )
 
 func main() {
@@ -60,5 +59,5 @@ func main() {
 	}
 
 	log.Fatal(httpserver.Serve(*bind, *url, db, sendmail, i18n,
-				   *noSignUp, *noVerification, *debug, *skipLogin))
+				   *noSignUp, *noVerification, *debug))
 }
