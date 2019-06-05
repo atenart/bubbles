@@ -147,15 +147,10 @@ func cursor(val, min, max float64) float64 {
 
 // Retrieve all the calculation for a given recipe.
 func calculations(r *beerxml.Recipe) *Calculation {
-	og := r.CalcOG()
-	fg := r.CalcFG()
-	abv := r.CalcABV()
-	ibu := r.CalcIBU()
-	color := r.CalcColor()
 	ibuOg := r.CalcIbuOg()
 	ibuRe := r.CalcIbuRe()
 
-	key := math.Round(color * 10) / 10
+	key := math.Round(r.EstColor * 10) / 10
 	if key <= 0 {
 		key = 0.1
 	} else if key > 40 {
@@ -168,43 +163,43 @@ func calculations(r *beerxml.Recipe) *Calculation {
 		BoilSize: math.Round(r.CalcBoilSize() * 10) / 10,
 		Cursors: map[string]Cursor{
 			"OG": {
-				math.Round(og * 1000) / 1000,
+				r.EstOG,
 				r.Style.OgMin,
 				r.Style.OgMax,
-				cursor(og, r.Style.OgMin, r.Style.OgMax),
-				(r.Style.OgMin <= og && og <= r.Style.OgMax),
+				cursor(r.EstOG, r.Style.OgMin, r.Style.OgMax),
+				(r.Style.OgMin <= r.EstOG && r.EstOG <= r.Style.OgMax),
 				"",
 			},
 			"FG": {
-				math.Round(fg * 1000) / 1000,
+				r.EstFG,
 				r.Style.FgMin,
 				r.Style.FgMax,
-				cursor(fg, r.Style.FgMin, r.Style.FgMax),
-				(r.Style.FgMin <= fg && fg <= r.Style.FgMax),
+				cursor(r.EstFG, r.Style.FgMin, r.Style.FgMax),
+				(r.Style.FgMin <= r.EstFG && r.EstFG <= r.Style.FgMax),
 				"",
 			},
 			"ABV": {
-				math.Round(abv * 10) / 10,
+				r.EstABV,
 				r.Style.AbvMin,
 				r.Style.AbvMax,
-				cursor(abv, r.Style.AbvMin, r.Style.AbvMax),
-				(r.Style.AbvMin <= abv && abv <= r.Style.AbvMax),
+				cursor(r.EstABV, r.Style.AbvMin, r.Style.AbvMax),
+				(r.Style.AbvMin <= r.EstABV && r.EstABV <= r.Style.AbvMax),
 				"",
 			},
 			"IBU": {
-				math.Round(ibu * 100) / 100,
+				r.IBU,
 				r.Style.IbuMin,
 				r.Style.IbuMax,
-				cursor(ibu, r.Style.IbuMin, r.Style.IbuMax),
-				(r.Style.IbuMin <= ibu && ibu <= r.Style.IbuMax),
+				cursor(r.IBU, r.Style.IbuMin, r.Style.IbuMax),
+				(r.Style.IbuMin <= r.IBU && r.IBU <= r.Style.IbuMax),
 				"",
 			},
 			"Color": {
-				math.Round(color * 100) / 100,
+				math.Round(r.EstColor * 100) / 100,
 				r.Style.ColorMin,
 				r.Style.ColorMax,
-				cursor(color, r.Style.ColorMin, r.Style.ColorMax),
-				(r.Style.ColorMin <= color && color <= r.Style.ColorMax),
+				cursor(r.EstColor, r.Style.ColorMin, r.Style.ColorMax),
+				(r.Style.ColorMin <= r.EstColor && r.EstColor <= r.Style.ColorMax),
 				template.CSS(fmt.Sprintf("rgb(%d, %d, %d)", hex.R, hex.G, hex.B)),
 			},
 			"IBU/OG": {
@@ -502,6 +497,14 @@ func formToRecipe(r *http.Request, recipe *db.Recipe) error {
 	if recipe.Name == "" {
 		return fmt.Errorf("'Name' is required.")
 	}
+
+	// Compute estimations.
+
+	recipe.XML.EstOG = math.Round(recipe.XML.CalcOG() * 1000) / 1000
+	recipe.XML.EstFG = math.Round(recipe.XML.CalcFG() * 1000) / 1000
+	recipe.XML.EstABV = math.Round(recipe.XML.CalcABV() * 10) / 10
+	recipe.XML.IBU = math.Round(recipe.XML.CalcIBU() * 10) / 10
+	recipe.XML.EstColor = math.Round(recipe.XML.CalcColor() *  100) / 100
 
 	return nil
 }
