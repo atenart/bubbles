@@ -48,6 +48,10 @@ type Hop struct {
 	Caryophyllene float64 `xml:"CARYOPHYLLENE"`
 	Cohumulone    float64 `xml:"COHUMULONE"`
 	Myrcene       float64 `xml:"MYRCENE"`
+	/* Extensions */
+	DisplayAmount string  `xml:"DISPLAY_AMOUNT"`
+	Inventory     string  `xml:"INVENTORY"`
+	DisplayTime   string  `xml:"DISPLAY_TIME"`
 }
 
 type Fermentable struct {
@@ -68,6 +72,11 @@ type Fermentable struct {
 	MaxInBatch     float64 `xml:"MAX_IN_BATCH"`
 	RecommendMash  bool    `xml:"RECOMMEND_MASH"`
 	IbuGalPerLb    float64 `xml:"IBU_GAL_PER_LB"`
+	/* Extensions */
+	DisplayAmount  string  `xml:"DISPLAY_AMOUNT"`
+	Potential      float64 `xml:"POTENTIAL"`
+	Inventory      string  `xml:"INVENTORY"`
+	DisplayColor   string  `xml:"DISPLAY_COLOR"`
 }
 
 type Yeast struct {
@@ -88,6 +97,13 @@ type Yeast struct {
 	TimesCultured  int32   `xml:"TIMES_CULTURED"`
 	MaxReuse       int32   `xml:"MAX_REUSE"`
 	AddToSecondary bool    `xml:"ADD_TO_SECONDARY"`
+	/* Extensions */
+	DisplayAmount  string  `xml:"DISPLAY_AMOUNT"`
+	DispMinTemp    string  `xml:"DISP_MIN_TEMP"`
+	DispMaxTemp    string  `xml:"DISP_MAX_TEMP"`
+	Inventory      string  `xml:"INVENTORY"`
+	CultureDate    string  `xml:"CULTURE_DATE"`
+
 }
 
 type Misc struct {
@@ -99,6 +115,10 @@ type Misc struct {
 	AmountIsWeight bool    `xml:"AMOUNT_IS_WEIGHT"`
 	UseFor         string  `xml:"USE_FOR"`
 	Notes          string  `xml:"NOTES"`
+	/* Extensions */
+	DisplayAmount string  `xml:"DISPLAY_AMOUNT"`
+	Inventory     string  `xml:"INVENTORY"`
+	DisplayTime   string  `xml:"DISPLAY_TIME"`
 }
 
 type Water struct {
@@ -113,76 +133,112 @@ type Water struct {
 	Magnesium   float64 `xml:"MAGNESIUM"`
 	Ph          float64 `xml:"PH"`
 	Notes       string  `xml:"NOTES"`
+	/* Extensions */
+	DisplayAmount string  `xml:"DISPLAY_AMOUNT"`
 }
 
 type Equipment struct {
-	Name            string  `xml:"NAME"`
-	Version         int32   `xml:"VERSION"`
-	BoilSize        float64 `xml:"BOIL_SIZE"`
-	BatchSize       float64 `xml:"BATCH_SIZE"`
-	TunVolume       float64 `xml:"TUN_VOLUME"`
-	TunWeight       float64 `xml:"TUN_WEIGHT"`
-	TunSpecificHeat float64 `xml:"TUN_SPECIFIC_HEAT"`
-	TopUpWater      float64 `xml:"TOP_UP_WATER"`
-	TrubChillerLoss float64 `xml:"TRUB_CHILLER_LOSS"`
-	EvapRate        float64 `xml:"EVAP_RATE"`
-	BoilTime        float64 `xml:"BOIL_TIME"`
-	CalcBoilVolume  bool    `xml:"CALC_BOIL_VOLUME"`
-	LauterDeadspace float64 `xml:"LAUTER_DEADSPACE"`
-	TopUpKettle     float64 `xml:"TOP_UP_KETTLE"`
-	HopUtilization  float64 `xml:"HOP_UTILIZATION"`
-	Notes           string  `xml:"NOTES"`
+	Name                   string  `xml:"NAME"`
+	Version                int32   `xml:"VERSION"`
+	BoilSize               float64 `xml:"BOIL_SIZE"`
+	BatchSize              float64 `xml:"BATCH_SIZE"`
+	TunVolume              float64 `xml:"TUN_VOLUME"`
+	TunWeight              float64 `xml:"TUN_WEIGHT"`
+	TunSpecificHeat        float64 `xml:"TUN_SPECIFIC_HEAT"`
+	TopUpWater             float64 `xml:"TOP_UP_WATER"`
+	TrubChillerLoss        float64 `xml:"TRUB_CHILLER_LOSS"`
+	EvapRate               float64 `xml:"EVAP_RATE"`
+	BoilTime               float64 `xml:"BOIL_TIME"`
+	CalcBoilVolume         bool    `xml:"CALC_BOIL_VOLUME"`
+	LauterDeadspace        float64 `xml:"LAUTER_DEADSPACE"`
+	TopUpKettle            float64 `xml:"TOP_UP_KETTLE"`
+	HopUtilization         float64 `xml:"HOP_UTILIZATION"`
+	Notes                  string  `xml:"NOTES"`
+	/* Extensions */
+	DisplayBoilSize        string  `xml:"DISPLAY_BOIL_SIZE"`
+	DisplayBatchSize       string  `xml:"DISPLAY_BATCH_SIZE"`
+	DisplayTunVolume       string  `xml:"DISPLAY_TUN_VOLUME"`
+	DisplayTunWeight       string  `xml:"DISPLAY_TUN_WEIGHT"`
+	DisplayTopUpWater      string  `xml:"DISPLAY_TOP_UP_WATER"`
+	DisplayTrubChillerLoss string  `xml:"DISPLAY_TRUB_CHILLER_LOSS"`
+	DisplayLauterDeadspace string  `xml:"DISPLAY_LAUTER_DEADSPACE"`
+	DisplayTopUpKettle     string  `xml:"DISPLAY_TOP_UP_KETTLE"`
 }
 
 type Style struct {
-	Name           string  `xml:"NAME"`
-	Category       string  `xml:"CATEGORY"`
-	Version        int32   `xml:"VERSION"`
-	CategoryNumber string  `xml:"CATEGORY_NUMBER"`
-	StyleLetter    string  `xml:"STYLE_LETTER"`
-	StyleGuide     string  `xml:"STYLE_GUIDE"`
-	Type           string  `xml:"TYPE"`
-	OgMin          float64 `xml:"OG_MIN"`
-	OgMax          float64 `xml:"OG_MAX"`
-	FgMin          float64 `xml:"FG_MIN"`
-	FgMax          float64 `xml:"FG_MAX"`
-	IbuMin         float64 `xml:"IBU_MIN"`
-	IbuMax         float64 `xml:"IBU_MAX"`
-	ColorMin       float64 `xml:"COLOR_MIN"`
-	ColorMax       float64 `xml:"COLOR_MAX"`
-	CarbMin        float64 `xml:"CARB_MIN"`
-	CarbMax        float64 `xml:"CARB_MAX"`
-	AbvMax         float64 `xml:"ABV_MAX"`
-	AbvMin         float64 `xml:"ABV_MIN"`
-	Notes          string  `xml:"NOTES"`
-	Profile        string  `xml:"PROFILE"`
-	Ingredients    string  `xml:"INGREDIENTS"`
-	Examples       string  `xml:"EXAMPLES"`
+	Name            string  `xml:"NAME"`
+	Category        string  `xml:"CATEGORY"`
+	Version         int32   `xml:"VERSION"`
+	CategoryNumber  string  `xml:"CATEGORY_NUMBER"`
+	StyleLetter     string  `xml:"STYLE_LETTER"`
+	StyleGuide      string  `xml:"STYLE_GUIDE"`
+	Type            string  `xml:"TYPE"`
+	OgMin           float64 `xml:"OG_MIN"`
+	OgMax           float64 `xml:"OG_MAX"`
+	FgMin           float64 `xml:"FG_MIN"`
+	FgMax           float64 `xml:"FG_MAX"`
+	IbuMin          float64 `xml:"IBU_MIN"`
+	IbuMax          float64 `xml:"IBU_MAX"`
+	ColorMin        float64 `xml:"COLOR_MIN"`
+	ColorMax        float64 `xml:"COLOR_MAX"`
+	CarbMin         float64 `xml:"CARB_MIN"`
+	CarbMax         float64 `xml:"CARB_MAX"`
+	AbvMax          float64 `xml:"ABV_MAX"`
+	AbvMin          float64 `xml:"ABV_MIN"`
+	Notes           string  `xml:"NOTES"`
+	Profile         string  `xml:"PROFILE"`
+	Ingredients     string  `xml:"INGREDIENTS"`
+	Examples        string  `xml:"EXAMPLES"`
+	/* Extensions */
+	DisplayOgMin    string  `xml:"DISPLAY_OG_MIN"`
+	DisplayOgMax    string  `xml:"DISPLAY_OG_MAX"`
+	DisplayFgMin    string  `xml:"DISPLAY_FG_MIN"`
+	DisplayFgMax    string  `xml:"DISPLAY_FG_MAX"`
+	DisplayColorMin string  `xml:"DISPLAY_COLOR_MIN"`
+	DisplayColorMax string  `xml:"DISPLAY_COLOR_MAX"`
+	OgRange         string  `xml:"OG_RANGE"`
+	FgRange         string  `xml:"FG_RANGE"`
+	IbuRange        string  `xml:"IBU_RANGE"`
+	CarbRange       string  `xml:"CARB_RANGE"`
+	ColorRange      string  `xml:"COLOR_RANGE"`
+	AbvRange        string  `xml:"ABV_RANGE"`
 }
 
 type MashStep struct {
-	Name         string  `xml:"NAME"`
-	Version      int32   `xml:"VERSION"`
-	Type         string  `xml:"TYPE"`
-	InfuseAmount float64 `xml:"INFUSE_AMOUNT"`
-	StepTemp     float64 `xml:"STEP_TEMP"`
-	StepTime     float64 `xml:"STEP_TIME"`
-	RampTime     float64 `xml:"RAMP_TIME"`
-	EndTemp      float64 `xml:"END_TEMP"`
+	Name             string  `xml:"NAME"`
+	Version          int32   `xml:"VERSION"`
+	Type             string  `xml:"TYPE"`
+	InfuseAmount     float64 `xml:"INFUSE_AMOUNT"`
+	StepTemp         float64 `xml:"STEP_TEMP"`
+	StepTime         float64 `xml:"STEP_TIME"`
+	RampTime         float64 `xml:"RAMP_TIME"`
+	EndTemp          float64 `xml:"END_TEMP"`
+	/* Extensions */
+	Description      string  `xml:"DESCRIPTION"`
+	WaterGrainRatio  string  `xml:"WATER_GRAIN_RATIO"`
+	DecoctionAmt     string  `xml:"DECOCTION_AMT"`
+	InfuseTemp       string  `xml:"INFUSE_TEMP"`
+	DisplayStepTemp  string  `xml:"DISPLAY_STEP_TEMP"`
+	DisplayInfuseAmt string  `xml:"DISPLAY_INFUSE_AMOUNT"`
 }
 
 type Mash struct {
-	Name            string     `xml:"NAME"`
-	Version         int32      `xml:"VERSION"`
-	GrainTemp       float64    `xml:"GRAIN_TEMP"`
-	MashSteps       []MashStep `xml:"MASH_STEPS>MASH_STEP"`
-	Notes           string     `xml:"NOTES"`
-	TunTemp         float64    `xml:"TUN_TEMP"`
-	SpargeTemp      float64    `xml:"SPARGE_TEMP"`
-	Ph              float64    `xml:"PH"`
-	TunWeight       float64    `xml:"TUN_WEIGHT"`
-	TunSpecificHeat float64    `xml:"TUN_SPECIFIC_HEAT"`
-	EquipAdjust     bool       `xml:"EQUIP_ADJUST"`
+	Name              string     `xml:"NAME"`
+	Version           int32      `xml:"VERSION"`
+	GrainTemp         float64    `xml:"GRAIN_TEMP"`
+	MashSteps         []MashStep `xml:"MASH_STEPS>MASH_STEP"`
+	Notes             string     `xml:"NOTES"`
+	TunTemp           float64    `xml:"TUN_TEMP"`
+	SpargeTemp        float64    `xml:"SPARGE_TEMP"`
+	Ph                float64    `xml:"PH"`
+	TunWeight         float64    `xml:"TUN_WEIGHT"`
+	TunSpecificHeat   float64    `xml:"TUN_SPECIFIC_HEAT"`
+	EquipAdjust       bool       `xml:"EQUIP_ADJUST"`
+	/* Extensions */
+	DisplayGrainTemp  string     `xml:"DISPLAY_GRAIN_TEMP"`
+	DisplayTunTemp    string     `xml:"DISPLAY_TUN_TEMP"`
+	DisplaySpargeTemp string     `xml:"DISPLAY_SPARGE_TEMP"`
+	DisplayTunWeight  string     `xml:"DISPLAY_TUN_WEIGHT"`
 }
 
 type Recipe struct {
@@ -224,4 +280,13 @@ type Recipe struct {
 	CarbonationTemp    float64       `xml:"CARBONATIOn_TEMP"`
 	PrimingSugarEquiv  float64       `xml:"PRIMING_SUGAR_EQUIV"`
 	KegPrimingFactor   float64       `xml:"KEG_PRIMING_FACTOR"`
+	/* Extensions */
+	EstOG              float64       `xml:"EST_OG"`
+	EstFG              float64       `xml:"EST_FG"`
+	EstColor           float64       `xml:"EST_COLOR"`
+	IBU                float64       `xml:"IBU"`
+	EstABV             float64       `xml:"EST_ABV"`
+	ABV                float64       `xml:"ABV"`
+	ActualEfficiency   float64       `xml:"ACTUAL_EFFICIENCY"`
+	Calories           float64       `xml:"CALORIES"`
 }
