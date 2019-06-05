@@ -28,6 +28,24 @@ import (
 	"github.com/atenart/bubbles/db"
 )
 
+// Recipes listing.
+func (s *Server) recipes(w http.ResponseWriter, r *http.Request, user *db.User) {
+	// Retrieve all the recipes authored by the current user.
+	recipes, err := s.db.GetUserRecipes(user.Id)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	s.executeTemplate(w, user, "recipes.html", struct{
+		Title   string
+		Recipes []*db.Recipe
+	}{
+		"Bubbles - recipes",
+		recipes,
+	})
+}
+
 // Return a *db.Recipe object, from the database if it exists or new if it
 // doesn't.
 func (s *Server) getRecipe(id, uid int64) (*db.Recipe, error) {
@@ -84,7 +102,6 @@ func (s *Server) recipe(w http.ResponseWriter, r *http.Request, user *db.User) {
 	s.executeTemplate(w, user, "recipe.html", struct{
 		CSRF         template.HTML
 		Title        string
-		User         *db.User
 		Recipe       *db.Recipe
 		Styles       *[]beerxml.Style
 		Calc         *Calculation
@@ -94,10 +111,9 @@ func (s *Server) recipe(w http.ResponseWriter, r *http.Request, user *db.User) {
 	}{
 		csrf.TemplateField(r),
 		fmt.Sprintf("Bubbles - recipe/%s", recipe.Name),
-		user,
 		recipe,
 		s.db.Styles,
-		calculations(recipe),
+		calculations(recipe.XML),
 		fermentables,
 		hops,
 		yeasts,
@@ -105,7 +121,6 @@ func (s *Server) recipe(w http.ResponseWriter, r *http.Request, user *db.User) {
 }
 
 type Cursor struct {
-	Name     string
 	Val      float64
 	Min, Max float64
 	Cursor   float64
@@ -114,8 +129,9 @@ type Cursor struct {
 }
 
 type Calculation struct {
-	BoilSize float64
-	Cursors  []Cursor
+	VolumeTot float64
+	BoilSize  float64
+	Cursors   map[string]Cursor
 }
 
 // Compute the cursor margin given a value and to boundaries.
@@ -130,14 +146,14 @@ func cursor(val, min, max float64) float64 {
 }
 
 // Retrieve all the calculation for a given recipe.
-func calculations(r *db.Recipe) *Calculation {
-	og := r.XML.CalcOG()
-	fg := r.XML.CalcFG()
-	abv := r.XML.CalcABV()
-	ibu := r.XML.CalcIBU()
-	color := r.XML.CalcColor()
-	ibuOg := r.XML.CalcIbuOg()
-	ibuRe := r.XML.CalcIbuRe()
+func calculations(r *beerxml.Recipe) *Calculation {
+	og := r.CalcOG()
+	fg := r.CalcFG()
+	abv := r.CalcABV()
+	ibu := r.CalcIBU()
+	color := r.CalcColor()
+	ibuOg := r.CalcIbuOg()
+	ibuRe := r.CalcIbuRe()
 
 	key := math.Round(color * 10) / 10
 	if key <= 0 {
@@ -148,55 +164,50 @@ func calculations(r *db.Recipe) *Calculation {
 	hex := beerxml.SrmHex[key]
 
 	return &Calculation{
-		BoilSize: math.Round(r.XML.CalcBoilSize() * 10) / 10,
-		Cursors: []Cursor{
-			{
-				"OG",
+		VolumeTot: math.Round(r.CalcVolumeTot() * 10) / 10,
+		BoilSize: math.Round(r.CalcBoilSize() * 10) / 10,
+		Cursors: map[string]Cursor{
+			"OG": {
 				math.Round(og * 1000) / 1000,
-				r.XML.Style.OgMin,
-				r.XML.Style.OgMax,
-				cursor(og, r.XML.Style.OgMin, r.XML.Style.OgMax),
-				(r.XML.Style.OgMin <= og && og <= r.XML.Style.OgMax),
+				r.Style.OgMin,
+				r.Style.OgMax,
+				cursor(og, r.Style.OgMin, r.Style.OgMax),
+				(r.Style.OgMin <= og && og <= r.Style.OgMax),
 				"",
 			},
-			{
-				"FG",
+			"FG": {
 				math.Round(fg * 1000) / 1000,
-				r.XML.Style.FgMin,
-				r.XML.Style.FgMax,
-				cursor(fg, r.XML.Style.FgMin, r.XML.Style.FgMax),
-				(r.XML.Style.FgMin <= fg && fg <= r.XML.Style.FgMax),
+				r.Style.FgMin,
+				r.Style.FgMax,
+				cursor(fg, r.Style.FgMin, r.Style.FgMax),
+				(r.Style.FgMin <= fg && fg <= r.Style.FgMax),
 				"",
 			},
-			{
-				"ABV",
+			"ABV": {
 				math.Round(abv * 10) / 10,
-				r.XML.Style.AbvMin,
-				r.XML.Style.AbvMax,
-				cursor(abv, r.XML.Style.AbvMin, r.XML.Style.AbvMax),
-				(r.XML.Style.AbvMin <= abv && abv <= r.XML.Style.AbvMax),
+				r.Style.AbvMin,
+				r.Style.AbvMax,
+				cursor(abv, r.Style.AbvMin, r.Style.AbvMax),
+				(r.Style.AbvMin <= abv && abv <= r.Style.AbvMax),
 				"",
 			},
-			{
-				"IBU",
+			"IBU": {
 				math.Round(ibu * 100) / 100,
-				r.XML.Style.IbuMin,
-				r.XML.Style.IbuMax,
-				cursor(ibu, r.XML.Style.IbuMin, r.XML.Style.IbuMax),
-				(r.XML.Style.IbuMin <= ibu && ibu <= r.XML.Style.IbuMax),
+				r.Style.IbuMin,
+				r.Style.IbuMax,
+				cursor(ibu, r.Style.IbuMin, r.Style.IbuMax),
+				(r.Style.IbuMin <= ibu && ibu <= r.Style.IbuMax),
 				"",
 			},
-			{
-				"Color",
+			"Color": {
 				math.Round(color * 100) / 100,
-				r.XML.Style.ColorMin,
-				r.XML.Style.ColorMax,
-				cursor(color, r.XML.Style.ColorMin, r.XML.Style.ColorMax),
-				(r.XML.Style.ColorMin <= color && color <= r.XML.Style.ColorMax),
+				r.Style.ColorMin,
+				r.Style.ColorMax,
+				cursor(color, r.Style.ColorMin, r.Style.ColorMax),
+				(r.Style.ColorMin <= color && color <= r.Style.ColorMax),
 				template.CSS(fmt.Sprintf("rgb(%d, %d, %d)", hex.R, hex.G, hex.B)),
 			},
-			{
-				"IBU/OG",
+			"IBU/OG": {
 				math.Round(ibuOg * 100) / 100,
 				0.2,
 				1.2,
@@ -204,8 +215,7 @@ func calculations(r *db.Recipe) *Calculation {
 				true,
 				"",
 			},
-			{
-				"IBU/RE",
+			"IBU/RE": {
 				math.Round(ibuRe * 100) / 100,
 				0,
 				15,
@@ -456,8 +466,7 @@ func (s *Server) saveRecipe(w http.ResponseWriter, r *http.Request, user *db.Use
 	sort(recipe.XML.Mash.MashSteps)
 
 	// Update recipe.
-	id, err = s.db.UpdateRecipe(recipe)
-	if err != nil {
+	if err = s.db.UpdateRecipe(recipe); err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}

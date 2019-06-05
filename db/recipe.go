@@ -60,30 +60,6 @@ func (db *DB) GetUserRecipes(uid int64) ([]*Recipe, error) {
 	return recipes, nil
 }
 
-// Generate a new uniq filename, and create it in $rootdir/
-func (db *DB) newUniqFile() (string, error) {
-	var file, subdir string
-	for {
-		token := GenToken(32)
-		subdir = token[:2]
-		file = token[2:]
-
-		if _, err := os.Stat(path.Join(db.rootdir, subdir, file)); err != nil {
-			break
-		}
-	}
-
-	if err := os.MkdirAll(path.Join(db.rootdir, subdir), 0700); err != nil {
-		return "", err
-	}
-
-	if _, err := os.Create(path.Join(db.rootdir, subdir, file)); err != nil {
-		return "", err
-	}
-
-	return path.Join(subdir, file), nil
-}
-
 // Add a new recipe.
 func (db *DB) AddRecipe(r *Recipe) (int64, error) {
 	var err error
@@ -99,7 +75,7 @@ VALUES (?, ?, ?, ?)`, r.UserId, r.Name, r.File, r.Public)
 		return -1, err
 	}
 
-	// Get the generated auto-inc id in response to the previous command.
+	// Get the generated id in response to the previous command.
 	id, err := result.LastInsertId()
 	if err != nil {
 		return -1, err
@@ -112,20 +88,16 @@ VALUES (?, ?, ?, ?)`, r.UserId, r.Name, r.File, r.Public)
 	return id, nil
 }
 
-// Update a recipe and returns its id.
-func (db *DB) UpdateRecipe(r *Recipe) (int64, error) {
+// Update a recipe.
+func (db *DB) UpdateRecipe(r *Recipe) error {
 	_, err := db.Exec(`
 REPLACE INTO recipes (id, user_id, name, file, public)
 VALUES (?, ?, ?, ?, ?)`, r.Id, r.UserId, r.Name, r.File, r.Public)
 	if err != nil {
-		return -1, err
+		return err
 	}
 
-	if err := beerxml.ExportFile(&r.XML, path.Join(db.rootdir, r.File)); err != nil {
-		return -1, err
-	}
-
-	return r.Id, nil
+	return beerxml.ExportFile(&r.XML, path.Join(db.rootdir, r.File))
 }
 
 // Delete a recipe.

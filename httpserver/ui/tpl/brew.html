@@ -1,0 +1,254 @@
+{{ template "head.html" . }}
+
+{{ template "navigation.html" }}
+
+<form method="post" id="form-steps">{{ .CSRF }}</form>
+
+<section class="section">
+  <div class="container">
+    <div class="columns">
+      <div class="column">
+        <h1 class="title is-4">{{ .StepName }}</h1>
+        <h2 class="subtitle is-6">{{ .StepDesc }}</h2>
+      </div>
+      <div class="column has-text-right">
+        <h1 class="title is-4">
+          <a class="title is-4" href="/recipe/{{ .Brew.RecipeId }}">{{ .Brew.XML.Name }}</a>
+        </h1>
+{{ if .Brew.XML.Date }}
+        <h2 class="subtitle is-6">{{ .Brew.XML.Date }}</h2>
+{{ end }}
+      </div>
+    </div>
+    <progress class="progress is-primary" value="{{ .Brew.Step }}" max="{{ .MaxStep }}"></progress>
+    <br />
+  </div>
+
+{{ if eq .Brew.Step 0 }}
+{{/* Preparation */}}
+
+  <div class="container">
+    <table class="table is-hoverable is-fullwidth">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Name</th>
+          <th>Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+{{ range .Ingredients.Fermentables }}
+        <tr>
+          <td><abbr title="Fermentable">F</abbr></td>
+          <td>{{ .Name }}</td>
+          <td>{{ .Amount }}kg</td>
+        </tr>
+{{ end }}
+{{ range .Ingredients.Hops }}
+        <tr>
+          <td><abbr title="Hop">H</abbr></td>
+          <td>{{ .Name }}</td>
+          <td>{{ .Amount }}kg</td>
+        </tr>
+{{ end }}
+{{ range .Ingredients.Yeasts }}
+        <tr>
+          <td><abbr title="Yeast">Y</abbr></td>
+          <td>{{ .Name }}</td>
+          <td>{{ .Amount }}{{ if .AmountIsWeight }}kg{{ else }}l{{ end }}</td>
+        </tr>
+{{ end }}
+      </tbody>
+    </table>
+  </div>
+
+{{ else if eq .Brew.Step 1 }}
+{{/* Mash */}}
+
+  <div class="container">
+    <div class="columns">
+      <div class="column">
+        <h2 class="subtitle">Fermentables</h2>
+        <table class="table is-hoverable is-fullwidth">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+{{ range .Brew.XML.Fermentables }}
+            <tr>
+              <td>{{ .Name }}</td>
+              <td>{{ .Amount }}kg</td>
+            </tr>
+{{ end }}
+          </tbody>
+        </table>
+      </div>
+      <div class="column">
+        <h2 class="subtitle">Mash steps</h2>
+        <table class="table is-hoverable is-fullwidth">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Temperature</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+{{ range .Brew.XML.Mash.MashSteps }}
+            <tr>
+              <td>{{ .Name }}</td>
+              <td>{{ .StepTemp }}°C</td>
+              <td>{{ .StepTime }}m</td>
+            </tr>
+{{ end }}
+          </tbody>
+        </table>
+
+        <h2 class="subtitle">Calculations</h2>
+        <ul>
+          <li>Est. volume total: {{ .Calc.VolumeTot }}l</li>
+          <li>Est. boil size: {{ .Calc.BoilSize }}l</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+{{ else if eq .Brew.Step 2 }}
+{{/* Boil */}}
+
+  <div class="container">
+    Est. boil size: {{ .Calc.BoilSize }}l
+    <table class="table is-hoverable is-fullwidth">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Amount</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody>
+{{ range .Brew.XML.Hops }}
+{{ if or (eq .Use "Aroma") (eq .Use "Boil") }}
+        <tr>
+          <td>{{ .Name }}</td>
+          <td>{{ .Amount }}kg</td>
+          <td>{{ .Time }}m</td>
+        </tr>
+{{ end }}
+{{ end }}
+      </tbody>
+    </table>
+  </div>
+
+{{ else if eq .Brew.Step 3 }}
+{{/* Fermentation */}}
+
+  <div class="container">
+    <div class="columns">
+      <div class="column">
+        <h2 class="subtitle">Parameters</h2>
+        <form action="/brew/{{ .Brew.Id }}/save" method="post">
+          {{ .CSRF }}
+          <div class="field is-horizontal">
+            <div class="field-body">
+              <div class="field">
+                <label class="label" for="est-og"><abbr title="Estimated">Est.</abbr> OG</label>
+                <div class="control">
+                  <input class="input" type="number" id="est-of" name="est-og"
+                    value="{{ .Calc.Cursors.OG.Val }}" disabled>
+                </div>
+              </div>
+              <div class="field">
+                <label class="label" for="est-color"><abbr title="Estimated">Est.</abbr> color (SRM)</label>
+                <div class="control">
+                  <input class="input" type="number" id="est-color" name="est-color"
+                    value="{{ .Calc.Cursors.Color.Val }}" disabled>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="og">OG</label>
+            <div class="control">
+              <input class="input" type="number" step="0.001" id="og" name="og"
+                value="{{ .Calc.Cursors.OG.Val }}">
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="control">
+              <button class="button is-link" id="button">Save</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="column">
+        <h2 class="subtitle">Fermentation steps</h2>
+        <p>Todo.</p>
+        <br />
+
+        <h2 class="subtitle">Dry hop</h2>
+        <table class="table is-hoverable is-fullwidth">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Amount</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+{{ range .Brew.XML.Hops }}
+{{ if eq .Use "Dry hop" }}
+            <tr>
+              <td>{{ .Name }}</td>
+              <td>{{ .Amount }}kg</td>
+              <td>{{ .Time }}m</td>
+            </tr>
+{{ end }}
+{{ end }}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+{{ else if eq .Brew.Step 4 }}
+{{/* Bottling */}}
+
+  <div class="container">
+  </div>
+
+{{ else if eq .Brew.Step 5 }}
+{{/* Tasting */}}
+
+  <div class="container">
+  </div>
+
+{{ end }}
+
+</section>
+
+<section class="section">
+  <div class="container is-centered">
+    <div class="columns is-mobile is-centered">
+      <div class="column is-narrow">
+        <button class="button is-light" form="form-steps" formaction="/brew/{{ .Brew.Id }}/prev"
+          {{ if eq .Brew.Step 0 }}disabled{{ end }}>
+          <span class="icon"><i class="fas fa-backward"></i></span>
+        </button>
+        <button class="button is-light" form="form-steps" formaction="/brew/{{ .Brew.Id }}/next"
+          {{ if eq .Brew.Step .MaxStep }}disabled{{ end }}>
+          <span class="icon"><i class="fas fa-forward"></i></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+</form>
+
+{{ template "foot.html" }}

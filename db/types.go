@@ -49,3 +49,44 @@ type Ingredient struct {
 	File   string
 	XML    interface{}
 }
+
+// Represents a brew.
+type Brew struct {
+	Id       int64
+	RecipeId int64
+	UserId   int64
+	Step     int64
+	File     string
+	XML      *beerxml.Recipe
+}
+
+// Brew steps.
+const (
+	StepPrepare = iota
+	StepMash
+	StepBoil
+	StepFermentation
+	StepBottle
+	StepTaste
+	StepMax = StepTaste
+)
+
+// Translate steps to names and descriptions.
+func StepName(step int64) (string, string) {
+	switch step {
+	case StepPrepare:
+		return "Preparation", "Ingredients checklist"
+	case StepMash:
+		return "Mash", ""
+	case StepBoil:
+		return "Boil", ""
+	case StepFermentation:
+		return "Fermentation", "Primary, secondary and terciary fermentations"
+	case StepBottle:
+		return "Bottling", ""
+	case StepTaste:
+		return "Tasting", ""
+	default:
+		return "Unknown step", ""
+	}
+}

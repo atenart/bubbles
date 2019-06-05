@@ -18,6 +18,7 @@ package db
 import (
 	"database/sql"
 	"math/rand"
+	"os"
 	"path"
 	"time"
 
@@ -68,6 +69,15 @@ CREATE TABLE IF NOT EXISTS ingredients (
 	CONSTRAINT tuple UNIQUE (user_id, name, type)
 )
 `,
+	`
+CREATE TABLE IF NOT EXISTS brews (
+	id INTEGER PRIMARY KEY,
+	user_id INTEGER_NOT_NULL,
+	recipe_id INTEGER NOT NULL,
+	step INTEGER DEFAULT 0,
+	file TEXT NOT NULL
+)
+`,
 }
 
 // Open a database, and create it if it does not exists.
@@ -98,6 +108,30 @@ func Open(rootdir string) (*DB, error) {
 	d.salt = d.LoadKey("salt.db", 64)
 
 	return d, nil
+}
+
+// Generate a new uniq filename, and create it in $rootdir/
+func (db *DB) newUniqFile() (string, error) {
+	var file, subdir string
+	for {
+		token := GenToken(32)
+		subdir = token[:2]
+		file = token[2:]
+
+		if _, err := os.Stat(path.Join(db.rootdir, subdir, file)); err != nil {
+			break
+		}
+	}
+
+	if err := os.MkdirAll(path.Join(db.rootdir, subdir), 0700); err != nil {
+		return "", err
+	}
+
+	if _, err := os.Create(path.Join(db.rootdir, subdir, file)); err != nil {
+		return "", err
+	}
+
+	return path.Join(subdir, file), nil
 }
 
 // Token charset.

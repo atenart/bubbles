@@ -97,6 +97,7 @@ func Serve(bind, url string, db *db.DB, sendmail *sendmail.Sendmail, i18n *i18n.
 
 	// Install authenticated mux handlers.
 	s.handleFunc("/", s.index)
+	s.handleFunc("/recipes", s.recipes)
 	s.handleFunc("/recipe/new", s.newRecipe)
 	s.handleFunc("/recipe/clone/{Id:[0-9]+}", s.cloneRecipe)
 	s.handleFunc("/recipe/{Id:[0-9]+}", s.recipe)
@@ -110,6 +111,12 @@ func Serve(bind, url string, db *db.DB, sendmail *sendmail.Sendmail, i18n *i18n.
 	s.handleFunc("/inventory", s.inventory)
 	s.handleFunc("/inventory/{Action:[a-z-]+}", s.saveInventory).Methods("POST")
 	s.handleFunc("/inventory/{Action:[a-z-]+}/{Item:[0-9]+}", s.saveInventory).Methods("POST")
+	s.handleFunc("/brews", s.brews)
+	s.handleFunc("/brew/new/{Id:[0-9]+}", s.newBrew)
+	s.handleFunc("/brew/{Id:[0-9]+}", s.brew)
+	s.handleFunc("/brew/{Id:[0-9]+}/prev", s.brewPrevStep).Methods("POST")
+	s.handleFunc("/brew/{Id:[0-9]+}/next", s.brewNextStep).Methods("POST")
+	s.handleFunc("/brew/{Id:[0-9]+}/save-fermentation", s.brewSaveFermentation).Methods("POST")
 
 	// Setup secure cookie.
 	s.cookie = securecookie.New(s.db.LoadKey("hash.securecookie", 64),
@@ -120,6 +127,11 @@ func Serve(bind, url string, db *db.DB, sendmail *sendmail.Sendmail, i18n *i18n.
 
 	// Start serving over HTTP.
 	return http.ListenAndServe(bind, rf(s.mux))
+}
+
+// Index.
+func (s *Server) index(w http.ResponseWriter, r *http.Request, user *db.User) {
+	http.Redirect(w, r, "/recipes", 302)
 }
 
 // Mux HandleFunc wrapper.

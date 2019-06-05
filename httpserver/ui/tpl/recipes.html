@@ -1,11 +1,10 @@
-{{ template "head.html" }}
+{{ template "head.html" . }}
 
 {{ template "navigation.html" }}
 
 <section class="section">
   <div class="container">
-    <!-- TODO: display current brews -->
-
+{{ if .Recipes }}
     <h1 class="title is-4">{{ L "Recipes" }}</h1>
     <a href="/recipe/new" class="button is-light">{{ L "New recipe" }}</a>
     <table class="table is-hoverable is-fullwidth">
@@ -30,6 +29,10 @@
 {{ end }}
       </tbody>
     </table>
+{{ else }}
+    <h1 class="title is-4">{{ L "No recipe yet" }} :(</h1>
+    <a href="/recipe/new" class="button is-light">{{ L "Make your first recipe" }}</a>
+{{ end }}
   </div>
 </section>
 

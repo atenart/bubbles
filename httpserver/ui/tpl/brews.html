@@ -1,0 +1,36 @@
+{{ template "head.html" . }}
+
+{{ template "navigation.html" }}
+
+<section class="section">
+  <div class="container">
+{{ if .Brews }}
+    <h1 class="title is-4">{{ L "Brews" }}</h1>
+    <table class="table is-hoverable is-fullwidth">
+      <thead>
+        <tr>
+          <th>{{ L "Recipe" }}</th>
+          <th>{{ L "Start Date" }}</th>
+          <th>{{ L "Current step" }}</th>
+        </tr>
+      </thead>
+      <tbody>
+{{ range .Brews }}
+        <tr>
+          <td><a href="/brew/{{ .Id }}">{{ .XML.Name }}</a></td>
+          <td>{{ .XML.Date }}</td>
+          <td>{{ .Step }}</td>
+        </tr>
+{{ end }}
+      </tbody>
+    </table>
+{{ else }}
+    <h1 class="title is-4">{{ L "No brew yet" }} :(</h1>
+    <p>
+      You can start a brew from a recipe page.
+    </p>
+{{ end }}
+  </div>
+</section>
+
+{{ template "foot.html" }}

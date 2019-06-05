@@ -95,8 +95,8 @@
                   <a class="button is-info" href="/recipe/clone/{{ .Recipe.Id }}">
                     {{ L "Clone" }}
                   </a>
-                  <a class="button is-danger" onclick="showModal('delete');">
-                    {{ L "Delete recipe" }}
+                  <a class="button is-info" href="/brew/new/{{ .Recipe.Id }}">
+                    {{ L "Brew" }}
                   </a>
                 </div>
               </div>
@@ -121,13 +121,13 @@
 
           <br />
 
-{{ range .Calc.Cursors }}
+{{ range $k, $v := .Calc.Cursors }}
           <div class="columns">
-            <div class="column"><strong>{{ .Name }}</strong>:
-{{ if ne .RGB "" }}
-              <span style="color: {{ .RGB }};">⬛</span>
+            <div class="column"><strong>{{ $k }}</strong>:
+{{ if ne $v.RGB "" }}
+              <span style="color: {{ $v.RGB }};">⬛</span>
 {{ end }}
-              {{ .Val }} ({{ .Min }}-{{ .Max }})
+              {{ $v.Val }} ({{ $v.Min }}-{{ $v.Max }})
             </div>
             <div class="column">
               <div class="slider">
@@ -144,7 +144,7 @@
 
       <br />
 
-      <h2 class="subtitle">Ingredients:</h2>
+      <h2 class="subtitle">Ingredients</h2>
       <a class="button is-light" onclick="showFermentable('/recipe/{{ .Recipe.Id }}');">
         Add fermentable
       </a>
@@ -240,7 +240,7 @@
         </tbody>
       </table>
 
-      <h2 class="subtitle">Mash steps:</h2>
+      <h2 class="subtitle">Mash steps</h2>
       <a class="button is-light" onclick="showMashStep();">
         Add step
       </a>
@@ -279,6 +279,19 @@
 {{ end }}
         </tbody>
       </table>
+
+      <h2 class="subtitle">Danger zone</h2>
+      <div class="field is-horizontal">
+        <div class="field-body">
+          <div class="field">
+            <div class="control">
+              <a class="button is-danger" onclick="showModal('delete');">
+                {{ L "Delete recipe" }}
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </form>
   </div>
 </section>
