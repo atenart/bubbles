@@ -121,13 +121,15 @@
 
           <br />
 
-{{ range $k, $v := .Calc.Cursors }}
+{{ range .CalcIdx }}
           <div class="columns">
-            <div class="column"><strong>{{ $k }}</strong>:
-{{ if ne $v.RGB "" }}
-              <span style="color: {{ $v.RGB }};">⬛</span>
+            <div class="column">
+              <strong>{{ . }}</strong>:
+{{ with (index $.Calc.Cursors .) }}
+{{ if ne .RGB "" }}
+              <span style="color: {{ .RGB }};">⬛</span>
 {{ end }}
-              {{ $v.Val }} ({{ $v.Min }}-{{ $v.Max }})
+              {{ .Val }} ({{ .Min }}-{{ .Max }})
             </div>
             <div class="column">
               <div class="slider">
@@ -138,6 +140,7 @@
               </div>
             </div>
           </div>
+{{ end }}
 {{ end }}
         </div>
       </div>

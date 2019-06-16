@@ -67,8 +67,8 @@ const (
 	StepBoil
 	StepFermentation
 	StepBottle
-	StepTaste
-	StepMax = StepTaste
+	StepDone
+	StepMax = StepDone
 )
 
 // Translate steps to names and descriptions.
@@ -84,8 +84,8 @@ func StepName(step int64) (string, string) {
 		return "Fermentation", "Primary, secondary and terciary fermentations"
 	case StepBottle:
 		return "Bottling", ""
-	case StepTaste:
-		return "Tasting", ""
+	case StepDone:
+		return "Done", "Beer is done brewing"
 	default:
 		return "Unknown step", ""
 	}

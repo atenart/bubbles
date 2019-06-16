@@ -150,7 +150,7 @@
     <div class="columns">
       <div class="column">
         <h2 class="subtitle">Parameters</h2>
-        <form action="/brew/{{ .Brew.Id }}/save" method="post">
+        <form action="/brew/{{ .Brew.Id }}/save-fermentation" method="post">
           {{ .CSRF }}
           <div class="field is-horizontal">
             <div class="field-body">
@@ -158,14 +158,14 @@
                 <label class="label" for="est-og"><abbr title="Estimated">Est.</abbr> OG</label>
                 <div class="control">
                   <input class="input" type="number" id="est-of" name="est-og"
-                    value="{{ .Calc.Cursors.OG.Val }}" disabled>
+                    value="{{ .Brew.XML.EstOG }}" disabled>
                 </div>
               </div>
               <div class="field">
                 <label class="label" for="est-color"><abbr title="Estimated">Est.</abbr> color (SRM)</label>
                 <div class="control">
                   <input class="input" type="number" id="est-color" name="est-color"
-                    value="{{ .Calc.Cursors.Color.Val }}" disabled>
+                    value="{{ .Brew.XML.EstColor }}" disabled>
                 </div>
               </div>
             </div>
@@ -175,7 +175,7 @@
             <label class="label" for="og">OG</label>
             <div class="control">
               <input class="input" type="number" step="0.001" id="og" name="og"
-                value="{{ .Calc.Cursors.OG.Val }}">
+                value="{{ .Brew.XML.OG }}">
             </div>
           </div>
 
@@ -191,6 +191,7 @@
         <p>Todo.</p>
         <br />
 
+{{ if .DryHop }}
         <h2 class="subtitle">Dry hop</h2>
         <table class="table is-hoverable is-fullwidth">
           <thead>
@@ -212,6 +213,7 @@
 {{ end }}
           </tbody>
         </table>
+{{ end }}
       </div>
     </div>
   </div>
@@ -220,12 +222,63 @@
 {{/* Bottling */}}
 
   <div class="container">
+    <form action="/brew/{{ .Brew.Id }}/save-bottling" method="post">
+      {{ .CSRF }}
+      <div class="field">
+        <label class="label" for="fg">FG</label>
+        <div class="control">
+          <input class="input" type="number" step="0.001" id="fg" name="fg"
+            value="{{ .Brew.XML.FG }}">
+        </div>
+      </div>
+      <div class="field">
+        <div class="control">
+          <button class="button is-link" id="button">Save</button>
+        </div>
+      </div>
+    </form>
+    TODO: sugar added / age to spend in bottles (+ temp).
   </div>
 
 {{ else if eq .Brew.Step 5 }}
-{{/* Tasting */}}
+{{/* Done */}}
 
   <div class="container">
+    <div class="columns">
+      <div class="column">
+        <form action="/brew/{{ .Brew.Id }}/save-done" method="post">
+          {{ .CSRF }}
+
+          <div class="field">
+            <label class="label" for="taste-notes">Taste notes</label>
+            <div class="control">
+              <textarea class="textarea" id="taste-notes" name="taste-notes">{{ .Brew.XML.TasteNotes }}</textarea>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="notes">Notes</label>
+            <div class="control">
+              <textarea class="textarea" id="notes" name="notes">{{ .Brew.XML.Notes }}</textarea>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="control">
+              <button class="button is-link" id="button">Save</button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="column">
+        <h2 class="subtitle">Parameters</h2>
+        <strong>Real ABV</strong>: {{ .Brew.XML.ABV }}°
+        <br />
+        <strong>Est. ABV</strong>: {{ .Calc.Cursors.ABV.Val }}°
+        <br />
+        <strong>IBU</strong>: {{ .Calc.Cursors.IBU.Val }}°
+      </div>
+    </div>
   </div>
 
 {{ end }}

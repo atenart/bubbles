@@ -18,6 +18,7 @@ package httpserver
 import (
 	"fmt"
 	"html/template"
+	"math"
 	"net/http"
 	"strconv"
 	"time"
@@ -37,12 +38,21 @@ func (s *Server) brews(w http.ResponseWriter, r *http.Request, user *db.User) {
 		return
 	}
 
+	// Retrieve step names (FIXME).
+	var names []string
+	for _, b := range brews {
+		n, _ := db.StepName(b.Step)
+		names = append(names, n)
+	}
+
 	s.executeTemplate(w, user, "brews.html", struct{
-		Title string
-		Brews []*db.Brew
+		Title     string
+		Brews     []*db.Brew
+		StepNames []string
 	}{
 		"Bubbles - brews",
 		brews,
+		names,
 	})
 }
 
@@ -70,6 +80,14 @@ func (s *Server) brew(w http.ResponseWriter, r *http.Request, user *db.User) {
 		ingredients = addUpIngredients(brew.XML)
 	}
 
+	dryHop := false
+	for _, h := range brew.XML.Hops {
+		if h.Use == "Dry hop" {
+			dryHop = true
+			break
+		}
+	}
+
 	name, desc := db.StepName(brew.Step)
 	s.executeTemplate(w, user, "brew.html", struct{
 		CSRF        template.HTML
@@ -80,15 +98,17 @@ func (s *Server) brew(w http.ResponseWriter, r *http.Request, user *db.User) {
 		Brew        *db.Brew
 		Calc        *Calculation
 		Ingredients *beerxml.BeerXML
+		DryHop      bool
 	}{
 		csrf.TemplateField(r),
 		fmt.Sprintf("Bubbles - brew/%s %s", brew.XML.Name, brew.XML.Date),
 		name,
 		desc,
-		db.StepTaste,
+		db.StepMax,
 		brew,
 		calculations(brew.XML),
 		ingredients,
+		dryHop,
 	})
 }
 
@@ -148,8 +168,47 @@ func (s *Server) getBrew(id, uid int64) (*db.Brew, error) {
 	return brew, nil
 }
 
-// Save information of a brew, during the fermentation step.
-func (s *Server) brewSaveFermentation(w http.ResponseWriter, r *http.Request, user *db.User) {
+// Save information of a brew.
+func (s *Server) brewSave(w http.ResponseWriter, r *http.Request, user *db.User) {
+	id, err := strconv.ParseInt(mux.Vars(r)["Id"], 10, 64)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	brew, err := s.getBrew(id, user.Id)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Couldn't parse form field.", 500)
+		return
+	}
+
+	switch mux.Vars(r)["Action"] {
+	case "fermentation":
+		brew.XML.OG, _ = strconv.ParseFloat(r.FormValue("og"), 64)
+	case "bottling":
+		brew.XML.FG, _ = strconv.ParseFloat(r.FormValue("fg"), 64)
+
+		// Update calc params.
+		brew.XML.ABV = math.Round(brew.XML.CalcRealABV() * 10) / 10
+	case "done":
+		brew.XML.Notes = r.FormValue("notes")
+		brew.XML.TasteNotes = r.FormValue("taste-notes")
+	default:
+		http.Error(w, "Unknown action.", 500)
+		return
+	}
+
+	if err := s.db.UpdateBrew(brew); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	http.Redirect(w, r, fmt.Sprintf("/brew/%d", id), 302)
 }
 
 // Move brew to the previous step.

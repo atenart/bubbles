@@ -105,6 +105,7 @@ func (s *Server) recipe(w http.ResponseWriter, r *http.Request, user *db.User) {
 		Recipe       *db.Recipe
 		Styles       *[]beerxml.Style
 		Calc         *Calculation
+		CalcIdx      []string
 		Fermentables []*beerxml.Fermentable
 		Hops         []*beerxml.Hop
 		Yeasts       []*beerxml.Yeast
@@ -114,6 +115,7 @@ func (s *Server) recipe(w http.ResponseWriter, r *http.Request, user *db.User) {
 		recipe,
 		s.db.Styles,
 		calculations(recipe.XML),
+		[]string{"OG", "FG", "ABV", "IBU", "Color", "IBU/OG", "IBU/RE"},
 		fermentables,
 		hops,
 		yeasts,

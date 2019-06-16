@@ -15,11 +15,11 @@
         </tr>
       </thead>
       <tbody>
-{{ range .Brews }}
+{{ range $k, $v := .Brews }}
         <tr>
-          <td><a href="/brew/{{ .Id }}">{{ .XML.Name }}</a></td>
-          <td>{{ .XML.Date }}</td>
-          <td>{{ .Step }}</td>
+          <td><a href="/brew/{{ $v.Id }}">{{ $v.XML.Name }}</a></td>
+          <td>{{ $v.XML.Date }}</td>
+          <td>{{ index $.StepNames $k }}</td>
         </tr>
 {{ end }}
       </tbody>

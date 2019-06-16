@@ -111,10 +111,20 @@ func (r *Recipe) CalcColor() float64 {
 
 // Compute the estimated alcohol by volume.
 // https://www.brassageamateur.com/wiki/index.php/Formules#Taux_d.27alcool
-func (r *Recipe) CalcABV() float64 {
-	abv := 76.08 * (r.CalcOG() - r.CalcFG()) / (1.775 - r.CalcOG())
-	abv *= r.CalcFG() / 0.794
+func (r *Recipe) calcABV(og, fg float64) float64 {
+	abv := 76.08 * (og - fg) / (1.775 - og)
+	abv *= og / 0.794
 	return abv
+}
+
+// Compute the estimated alcohol by volume, using estimated OG and FG.
+func (r *Recipe) CalcABV() float64 {
+	return r.calcABV(r.CalcOG(), r.CalcFG())
+}
+
+// Compute the estimated alcohol by volume, using the real OG and FG.
+func (r *Recipe) CalcRealABV() float64 {
+	return r.calcABV(r.OG, r.FG)
 }
 
 // Compute the bitterness using the Tinseth formula.
