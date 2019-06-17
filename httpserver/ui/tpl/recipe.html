@@ -243,45 +243,142 @@
         </tbody>
       </table>
 
-      <h2 class="subtitle">Mash steps</h2>
-      <a class="button is-light" onclick="showMashStep();">
-        Add step
-      </a>
-      <table class="table is-hoverable is-fullwidth">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Temperature</th>
-            <th>Time</th>
-            <th class="has-text-right-desktop">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
+      <div class="columns">
+        <div class="column">
+          <h2 class="subtitle">Mash steps</h2>
+          <a class="button is-light" onclick="showMashStep();">
+            Add step
+          </a>
+          <table class="table is-hoverable is-fullwidth">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Temperature</th>
+                <th>Time</th>
+                <th class="has-text-right-desktop">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
 {{ if .Recipe.XML.Mash }}
 {{ if .Recipe.XML.Mash.MashSteps }}
 {{ range $k, $v := .Recipe.XML.Mash.MashSteps }}
-          <tr id="mash-step-{{ $k }}" data-id="{{ $k }}" data-name="{{ $v.Name }}" data-type="{{ $v.Type }}"
-              data-temp="{{ $v.StepTemp }}" data-time="{{ $v.StepTime }}">
-            <td>{{ $v.Name }}</td>
-            <td>{{ $v.Type }}</td>
-            <td>{{ $v.StepTemp }}°C</td>
-            <td>{{ $v.StepTime }}m</td>
-            <td class="has-text-right-desktop">
-              <a class="button is-small" title="Edit" onclick="editMashStep('#mash-step-{{ $k }}')">
-                <span class="icon is-small"><i class="fas fa-edit"></i></span>
-              </a>
-              <button class="button is-small" title="Delete"
-                  form="form-actions" formaction="/recipe/{{ $.Recipe.Id }}/del-mash-step/{{ $k }}">
-                <span class="icon is-small"><i class="fas fa-trash"></i></span>
-              </button>
-            </td>
-          </tr>
+              <tr id="mash-step-{{ $k }}" data-id="{{ $k }}" data-name="{{ $v.Name }}" data-type="{{ $v.Type }}"
+                  data-temp="{{ $v.StepTemp }}" data-time="{{ $v.StepTime }}">
+                <td>{{ $v.Name }}</td>
+                <td>{{ $v.Type }}</td>
+                <td>{{ $v.StepTemp }}°C</td>
+                <td>{{ $v.StepTime }}m</td>
+                <td class="has-text-right-desktop">
+                  <a class="button is-small" title="Edit" onclick="editMashStep('#mash-step-{{ $k }}')">
+                    <span class="icon is-small"><i class="fas fa-edit"></i></span>
+                  </a>
+                  <button class="button is-small" title="Delete"
+                      form="form-actions" formaction="/recipe/{{ $.Recipe.Id }}/del-mash-step/{{ $k }}">
+                    <span class="icon is-small"><i class="fas fa-trash"></i></span>
+                  </button>
+                </td>
+              </tr>
 {{ end }}
 {{ end }}
 {{ end }}
-        </tbody>
-      </table>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="column">
+          <h2 class="subtitle">Fermentation steps</h2>
+          <div class="field is-horizontal">
+            <div class="field-label"></div>
+            <div class="field-body">
+              <div class="field">
+                <label class="label">Age (d)</label>
+              </div>
+              <div class="field">
+                <label class="label">Temp. (°C)</label>
+              </div>
+            </div>
+          </div>
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">Primary</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <input class="input" type="number" step="0.5" name="primary-age" value="{{ .Recipe.XML.PrimaryAge }}">
+                </div>
+              </div>
+              <div class="field">
+                <div class="control">
+                  <input class="input" type="number" name="primary-temp" value="{{ .Recipe.XML.PrimaryTemp }}">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">Secondary</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <input class="input" type="number" step="0.5" name="secondary-age" value="{{ .Recipe.XML.SecondaryAge }}">
+                </div>
+              </div>
+              <div class="field">
+                <div class="control">
+                  <input class="input" type="number" name="secondary-temp" value="{{ .Recipe.XML.SecondaryTemp }}">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">Tertiary</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <input class="input" type="number" step="0.5" name="tertiary-age" value="{{ .Recipe.XML.TertiaryAge }}">
+                </div>
+              </div>
+              <div class="field">
+                <div class="control">
+                  <input class="input" type="number" name="tertiary-temp" value="{{ .Recipe.XML.TertiaryTemp }}">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="field is-horizontal">
+            <div class="field-label is-normal">
+              <label class="label">Bottle</label>
+            </div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <input class="input" type="number" step="0.5" name="age" value="{{ .Recipe.XML.Age }}">
+                </div>
+              </div>
+              <div class="field">
+                <div class="control">
+                  <input class="input" type="number" name="age-temp" value="{{ .Recipe.XML.AgeTemp }}">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="field is-horizontal">
+            <div class="field-label"></div>
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <button class="button is-primary">Save</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <h2 class="subtitle">Danger zone</h2>
       <div class="field is-horizontal">

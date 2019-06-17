@@ -495,6 +495,15 @@ func formToRecipe(r *http.Request, recipe *db.Recipe) error {
 	recipe.XML.BoilTime, _ = strconv.ParseFloat(r.FormValue("boil-time"), 64)
 	recipe.XML.Efficiency, _ = strconv.ParseFloat(r.FormValue("efficiency"), 64)
 
+	recipe.XML.PrimaryAge, _ = strconv.ParseFloat(r.FormValue("primary-age"), 64)
+	recipe.XML.PrimaryTemp, _ = strconv.ParseFloat(r.FormValue("primary-temp"), 64)
+	recipe.XML.SecondaryAge, _ = strconv.ParseFloat(r.FormValue("secondary-age"), 64)
+	recipe.XML.SecondaryTemp, _ = strconv.ParseFloat(r.FormValue("secondary-temp"), 64)
+	recipe.XML.TertiaryAge, _ = strconv.ParseFloat(r.FormValue("tertiary-age"), 64)
+	recipe.XML.TertiaryTemp, _ = strconv.ParseFloat(r.FormValue("tertiary-temp"), 64)
+	recipe.XML.Age, _ = strconv.ParseFloat(r.FormValue("age"), 64)
+	recipe.XML.AgeTemp, _ = strconv.ParseFloat(r.FormValue("age-temp"), 64)
+
 	// Sanity checks.
 	if recipe.Name == "" {
 		return fmt.Errorf("'Name' is required.")
