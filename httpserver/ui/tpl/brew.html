@@ -149,6 +149,26 @@
   <div class="container">
     <div class="columns">
       <div class="column">
+        <h2 class="subtitle">Yeasts</h2>
+        <table class="table is-hoverable is-fullwidth">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Form</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+{{ range .Brew.XML.Yeasts }}
+            <tr>
+              <td>{{ .Name }}</td>
+              <td>{{ .Form }}</td>
+              <td>{{ .Amount }}{{ if .AmountIsWeight }}kg{{ else }}l{{ end }}</td>
+            </tr>
+{{ end }}
+          </tbody>
+        </table>
+
         <h2 class="subtitle">Parameters</h2>
         <form action="/brew/{{ .Brew.Id }}/save-fermentation" method="post">
           {{ .CSRF }}
@@ -188,8 +208,32 @@
       </div>
       <div class="column">
         <h2 class="subtitle">Fermentation steps</h2>
-        <p>Todo.</p>
-        <br />
+        <table class="table is-hoverable is-fullwidth">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Age</th>
+              <th>Temp.</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>Primary</th>
+              <td>{{ .Brew.XML.PrimaryAge }}d</td>
+              <td>{{ .Brew.XML.PrimaryTemp }}°C</td>
+            </tr>
+            <tr>
+              <th>Secondary</th>
+              <td>{{ .Brew.XML.SecondaryAge }}d</td>
+              <td>{{ .Brew.XML.SecondaryTemp }}°C</td>
+            </tr>
+            <tr>
+              <th>Tertiary</th>
+              <td>{{ .Brew.XML.TertiaryAge }}d</td>
+              <td>{{ .Brew.XML.TertiaryTemp }}°C</td>
+            </tr>
+          </tbody>
+        </table>
 
 {{ if .DryHop }}
         <h2 class="subtitle">Dry hop</h2>
@@ -222,22 +266,29 @@
 {{/* Bottling */}}
 
   <div class="container">
-    <form action="/brew/{{ .Brew.Id }}/save-bottling" method="post">
-      {{ .CSRF }}
-      <div class="field">
-        <label class="label" for="fg">FG</label>
-        <div class="control">
-          <input class="input" type="number" step="0.001" id="fg" name="fg"
-            value="{{ .Brew.XML.FG }}">
-        </div>
+    <div class="columns">
+      <div class="column">
+        <form action="/brew/{{ .Brew.Id }}/save-bottling" method="post">
+          {{ .CSRF }}
+          <div class="field">
+            <label class="label" for="fg">FG</label>
+            <div class="control">
+              <input class="input" type="number" step="0.001" id="fg" name="fg"
+                value="{{ .Brew.XML.FG }}">
+            </div>
+          </div>
+          <div class="field">
+            <div class="control">
+              <button class="button is-link" id="button">Save</button>
+            </div>
+          </div>
+        </form>
       </div>
-      <div class="field">
-        <div class="control">
-          <button class="button is-link" id="button">Save</button>
-        </div>
+      <div class="column">
+        <strong>Age in bottle</strong>:
+        {{ .Brew.XML.Age }}d at {{ .Brew.XML.AgeTemp }}°C.
       </div>
-    </form>
-    TODO: sugar added / age to spend in bottles (+ temp).
+    </div>
   </div>
 
 {{ else if eq .Brew.Step 5 }}
@@ -276,7 +327,7 @@
         <br />
         <strong>Est. ABV</strong>: {{ .Calc.Cursors.ABV.Val }}°
         <br />
-        <strong>IBU</strong>: {{ .Calc.Cursors.IBU.Val }}°
+        <strong>IBU</strong>: {{ .Calc.Cursors.IBU.Val }}
       </div>
     </div>
   </div>
