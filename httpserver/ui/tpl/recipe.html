@@ -157,6 +157,9 @@
       <a class="button is-light" onclick="showYeast('/recipe/{{ .Recipe.Id }}');">
         Add yeast
       </a>
+      <a class="button is-light" onclick="showMisc('/recipe/{{ .Recipe.Id }}');">
+        Add misc
+      </a>
       <table class="table is-hoverable is-fullwidth">
         <thead>
           <tr>
@@ -193,6 +196,32 @@
 {{ end }}
 {{ end }}
 
+{{ if .Recipe.XML.Miscs }}
+{{ range $k, $v := .Recipe.XML.Miscs }}
+{{ if eq $v.Use "Mash" }}
+          <tr id="misc-{{ $k }}" data-id="{{ $k }}" data-name="{{ $v.Name }}" data-type="{{ $v.Type }}"
+              data-amount="{{ $v.Amount }}" data-amount-is-weight="{{ $v.AmountIsWeight }}"
+              data-use="{{ $v.Use }}" data-time="{{ $v.Time }}">
+            <td><abbr title="Misc">M</abbr></td>
+            <td>{{ $v.Name }}</td>
+            <td>{{ $v.Type }}</td>
+            <td>{{ $v.Amount }}{{ if $v.AmountIsWeight }}kg{{ else }}l{{ end }}</td>
+            <td>{{ $v.Use }} - {{ $v.Time }}m</td>
+            <td>-</td>
+            <td class="has-text-right-desktop">
+              <a class="button is-small" title="Edit" onclick="editMisc('/recipe/{{ $.Recipe.Id }}' ,'#misc-{{ $k }}')">
+                <span class="icon is-small"><i class="fas fa-edit"></i></span>
+              </a>
+              <button class="button is-small" title="Delete"
+                  form="form-actions" formaction="/recipe/{{ $.Recipe.Id }}/del-misc/{{ $k }}">
+                <span class="icon is-small"><i class="fas fa-trash"></i></span>
+              </button>
+            </td>
+          </tr>
+{{ end }}
+{{ end }}
+{{ end }}
+
 {{ if .Recipe.XML.Hops }}
 {{ range $k, $v := .Recipe.XML.Hops }}
           <tr id="hop-{{ $k }}" data-id="{{ $k }}" data-name="{{ $v.Name }}" data-form="{{ $v.Form }}"
@@ -217,6 +246,32 @@
 {{ end }}
 {{ end }}
 
+{{ if .Recipe.XML.Miscs }}
+{{ range $k, $v := .Recipe.XML.Miscs }}
+{{ if eq $v.Use "Boil" }}
+          <tr id="misc-{{ $k }}" data-id="{{ $k }}" data-name="{{ $v.Name }}" data-type="{{ $v.Type }}"
+              data-amount="{{ $v.Amount }}" data-amount-is-weight="{{ $v.AmountIsWeight }}"
+              data-use="{{ $v.Use }}" data-time="{{ $v.Time }}">
+            <td><abbr title="Misc">M</abbr></td>
+            <td>{{ $v.Name }}</td>
+            <td>{{ $v.Type }}</td>
+            <td>{{ $v.Amount }}{{ if $v.AmountIsWeight }}kg{{ else }}l{{ end }}</td>
+            <td>{{ $v.Use }} - {{ $v.Time }}m</td>
+            <td>-</td>
+            <td class="has-text-right-desktop">
+              <a class="button is-small" title="Edit" onclick="editMisc('/recipe/{{ $.Recipe.Id }}' ,'#misc-{{ $k }}')">
+                <span class="icon is-small"><i class="fas fa-edit"></i></span>
+              </a>
+              <button class="button is-small" title="Delete"
+                  form="form-actions" formaction="/recipe/{{ $.Recipe.Id }}/del-misc/{{ $k }}">
+                <span class="icon is-small"><i class="fas fa-trash"></i></span>
+              </button>
+            </td>
+          </tr>
+{{ end }}
+{{ end }}
+{{ end }}
+
 {{ if .Recipe.XML.Yeasts }}
 {{ range $k, $v := .Recipe.XML.Yeasts }}
           <tr id="yeast-{{ $k }}" data-id="{{ $k }}" data-name="{{ $v.Name }}" data-form="{{ $v.Form }}"
@@ -238,6 +293,32 @@
               </button>
             </td>
           </tr>
+{{ end }}
+{{ end }}
+
+{{ if .Recipe.XML.Miscs }}
+{{ range $k, $v := .Recipe.XML.Miscs }}
+{{ if and (ne $v.Use "Mash") (ne $v.Use "Boil") }}
+          <tr id="misc-{{ $k }}" data-id="{{ $k }}" data-name="{{ $v.Name }}" data-type="{{ $v.Type }}"
+              data-amount="{{ $v.Amount }}" data-amount-is-weight="{{ $v.AmountIsWeight }}"
+              data-use="{{ $v.Use }}" data-time="{{ $v.Time }}">
+            <td><abbr title="Misc">M</abbr></td>
+            <td>{{ $v.Name }}</td>
+            <td>{{ $v.Type }}</td>
+            <td>{{ $v.Amount }}{{ if $v.AmountIsWeight }}kg{{ else }}l{{ end }}</td>
+            <td>{{ $v.Use }}{{ if ne $v.Use "Bottling" }} - {{ $v.Time }}m{{ end }}</td>
+            <td>-</td>
+            <td class="has-text-right-desktop">
+              <a class="button is-small" title="Edit" onclick="editMisc('/recipe/{{ $.Recipe.Id }}' ,'#misc-{{ $k }}')">
+                <span class="icon is-small"><i class="fas fa-edit"></i></span>
+              </a>
+              <button class="button is-small" title="Delete"
+                  form="form-actions" formaction="/recipe/{{ $.Recipe.Id }}/del-misc/{{ $k }}">
+                <span class="icon is-small"><i class="fas fa-trash"></i></span>
+              </button>
+            </td>
+          </tr>
+{{ end }}
 {{ end }}
 {{ end }}
         </tbody>

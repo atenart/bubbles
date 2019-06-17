@@ -153,6 +153,18 @@ func addUpIngredients(recipe *beerxml.Recipe) *beerxml.BeerXML {
 	}
 	sort(ingredients.Yeasts)
 
+	// Add up miscs.
+	seen = make(map[string]int)
+	for _, m := range recipe.Miscs {
+		if _, ok := seen[m.Name]; !ok {
+			ingredients.Miscs = append(ingredients.Miscs, m)
+			seen[m.Name] = len(ingredients.Miscs) - 1
+			continue
+		}
+		ingredients.Miscs[seen[m.Name]].Amount += m.Amount
+	}
+	sort(ingredients.Miscs)
+
 	return &ingredients
 }
 

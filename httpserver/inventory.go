@@ -82,6 +82,8 @@ func (s *Server) saveInventory(w http.ResponseWriter, r *http.Request, user *db.
 		case "edit-hop":
 			fallthrough
 		case "edit-yeast":
+			fallthrough
+		case "edit-misc":
 			if err := s.editIngredient(r, user, ingredient); err != nil {
 				http.Error(w, err.Error(), 500)
 				return
@@ -137,6 +139,16 @@ func (s *Server) addIngredient(r *http.Request, user *db.User, action string) er
 		i.Type = "yeast"
 		i.Link = r.FormValue("link")
 		i.XML = &y
+	case "add-misc":
+		var m beerxml.Misc
+		if err := formToMisc(r, &m); err != nil {
+			return err
+		}
+
+		i.Name = m.Name
+		i.Type = "misc"
+		i.Link = r.FormValue("link")
+		i.XML = &m
 	default:
 		return fmt.Errorf("Unknown ingredient")
 	}
@@ -154,6 +166,8 @@ func (s *Server) editIngredient(r *http.Request, user *db.User, i *db.Ingredient
 		err = formToHop(r, elmt)
 	case *beerxml.Yeast:
 		err = formToYeast(r, elmt)
+	case *beerxml.Misc:
+		err = formToMisc(r, elmt)
 	default:
 		err = fmt.Errorf("Unkonwn type.")
 	}

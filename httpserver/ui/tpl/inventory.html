@@ -16,6 +16,9 @@
     <a class="button is-light" onclick="showYeast('/inventory');">
       {{ L "Add yeast" }}
     </a>
+    <a class="button is-light" onclick="showMisc('/inventory');">
+      {{ L "Add misc" }}
+    </a>
     <table class="table is-hoverable is-fullwidth">
       <thead>
         <tr>
@@ -80,6 +83,24 @@
           <td><a href="{{ .Link }}">{{ .Link }}</a></td>
           <td class="has-text-right-desktop">
             <a class="button is-small" title="Edit" onclick="editYeast('/inventory' ,'#yeast-{{ .Id }}')">
+              <span class="icon is-small"><i class="fas fa-edit"></i></span>
+            </a>
+            <button class="button is-small" title="Delete"
+                form="form-actions" formaction="/inventory/del/{{ .Id }}">
+              <span class="icon is-small"><i class="fas fa-trash"></i></span>
+            </button>
+          </td>
+        </tr>
+{{ else if eq .Type "misc" }}
+        <tr id="misc-{{ .Id }}" data-id="{{ .Id }}" data-name="{{ .XML.Name }}" data-type="{{ .XML.Type }}"
+            data-amount="{{ .XML.Amount }}" data-amount-is-weight="{{ .XML.AmountIsWeight }}">
+          <td><abbr title="Misc">M</abbr></td>
+          <td>{{ .XML.Name }}</td>
+          <td>{{ .XML.Type }}</td>
+          <td>{{ .XML.Amount }}{{ if .XML.AmountIsWeight }}kg{{ else }}l{{ end }}</td>
+          <td><a href="{{ .Link }}">{{ .Link }}</a></td>
+          <td class="has-text-right-desktop">
+            <a class="button is-small" title="Edit" onclick="editMisc('/inventory' ,'#misc-{{ .Id }}')">
               <span class="icon is-small"><i class="fas fa-edit"></i></span>
             </a>
             <button class="button is-small" title="Delete"

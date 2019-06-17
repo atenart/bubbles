@@ -309,6 +309,126 @@
   </div>
 </div>
 
+<div class="modal" id="modal-misc">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title" id="title"></p>
+      <button class="delete" aria-label="close" onclick="hideModal('misc');">
+      </button>
+    </header>
+    <section class="modal-card-body">
+      <form method="post" autocomplete="off">
+        {{ .CSRF }}
+{{ if eq pageName "recipe.html" }}
+{{ if .Miscs }}
+        <div class="field is-horizontal">
+          <div class="field-body">
+            <div class="field">
+              <input class="input" type="text" list="inventory-miscs-list"
+                id="inventory-miscs" placeholder="{{ L "Search in inventory" }}"
+                onchange="selectMisc();">
+              <datalist id="inventory-miscs-list">
+{{ range .Miscs }}
+                <option id="inventory-misc-{{ .Name }}" value="{{ .Name }}"
+                  data-name="{{ .Name }}" data-type="{{ .Type }}">
+                  {{ .Name }}
+                </option>
+{{ end }}
+              </datalist>
+            </div>
+          </div>
+        </div>
+{{ end }}
+{{ end }}
+        <div class="field is-horizontal">
+          <div class="field-body">
+            <div class="field">
+              <label class="label" for="name">Name</label>
+              <div class="control">
+                <input class="input" type="text" id="name" name="name">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Type</label>
+              <div class="control">
+                <div class="select is-fullwidth">
+                  <select name="type" id="type">
+                    <option value="Spice">Spice</option>
+                    <option value="Fining">Fining</option>
+                    <option value="Water Agent">Water Agent</option>
+                    <option value="Herb">Herb</option>
+                    <option value="Flavor">Flavor</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+{{ if eq pageName "recipe.html" }}
+            <div class="field">
+              <label class="label">Use</label>
+              <div class="control">
+                <div class="select is-fullwidth">
+                  <select name="use" id="use">
+                    <option value="Mash">Mash</option>
+                    <option value="Boil">Boil</option>
+                    <option value="Primary">Primary</option>
+                    <option value="Secondary">Secondary</option>
+                    <option value="Bottling">Bottling</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+{{ end }}
+          </div>
+        </div>
+        <div class="field is-horizontal">
+          <div class="field-body">
+{{ if eq pageName "recipe.html" }}
+            <div class="field">
+              <label class="label" for="time">Time (m)</label>
+              <div class="control">
+                <input class="input" type="number" id="time" name="time">
+              </div>
+            </div>
+{{ end }}
+            <div class="field">
+              <label class="label" for="amount">Amount</label>
+              <div class="control">
+                <input class="input" type="number" step="0.001" id="amount" name="amount">
+              </div>
+            </div>
+            <div class="field">
+              <label class="label">Amount unit</label>
+              <div class="control">
+                <div class="select is-fullwidth">
+                  <select name="unit" id="unit">
+                    <option value="kilogram">Kilogram</option>
+                    <option value="litre">Litre</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+{{ if eq pageName "inventory.html" }}
+        <div class="field">
+          <label class="label" for="link">Link</label>
+          <div class="control">
+            <input class="input" type="text" id="link" name="link">
+          </div>
+        </div>
+{{ end }}
+        <div class="field">
+          <div class="control">
+            <button class="button is-link" id="button"></button>
+          </div>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>
+
 <script>
   function configureModal(id, title, button, action) {
     $(`#modal-${id} #title`).text(title);
@@ -332,6 +452,12 @@
     configureModal("yeast", "{{ L "Add yeast" }}", "{{ L "Add" }}",
                    prefix + "/add-yeast");
     showModal("yeast");
+  }
+
+  function showMisc(prefix) {
+    configureModal("misc", "{{ L "Add misc" }}", "{{ L "Add" }}",
+                   prefix + "/add-misc");
+    showModal("misc");
   }
 
   function fillFermentable(id) {
@@ -367,6 +493,21 @@
     }
   }
 
+  function fillMisc(id) {
+    $("#modal-misc #name").val($(id).data("name"));
+    $("#modal-misc #type").val($(id).data("type"));
+    $("#modal-misc #use").val($(id).data("use"));
+    $("#modal-misc #time").val($(id).data("time"));
+    $("#modal-misc #amount").val($(id).data("amount"));
+    $("#modal-misc #link").val($(id).data("link"));
+
+    if (!$(id).data("amount-is-weight")) {
+      $("#modal-misc #unit").val("litre");
+    } else {
+      $("#modal-misc #unit").val("kilogram");
+    }
+  }
+
   function editFermentable(prefix, id) {
     configureModal("fermentable", "{{ L "Edit fermentable" }}", "{{ L "Save" }}",
                    prefix + "/edit-fermentable/" + $(id).data("id"));
@@ -386,6 +527,13 @@
                    prefix + "/edit-yeast/" + $(id).data("id"));
     showModal('yeast');
     fillYeast(id);
+  }
+
+  function editMisc(prefix, id) {
+    configureModal("misc", "{{ L "Edit misc" }}", "{{ L "Save" }}",
+                   prefix + "/edit-misc/" + $(id).data("id"));
+    showModal('misc');
+    fillMisc(id);
   }
 
   function selectFermentable() {
@@ -416,5 +564,15 @@
       return;
 
     fillYeast(id);
+  }
+
+  function selectMisc() {
+    var id = "#inventory-misc-" + $("#inventory-miscs").val();
+
+    // Check the element exists.
+    if ($(id).length == 0)
+      return;
+
+    fillMisc(id);
   }
 </script>

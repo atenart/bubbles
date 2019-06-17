@@ -111,14 +111,15 @@ type Misc struct {
 	Version        int32   `xml:"VERSION"`
 	Type           string  `xml:"TYPE"`
 	Use            string  `xml:"USE"`
+	Time           float64 `xml:"TIME"`
 	Amount         float64 `xml:"AMOUNT"`
 	AmountIsWeight bool    `xml:"AMOUNT_IS_WEIGHT"`
 	UseFor         string  `xml:"USE_FOR"`
 	Notes          string  `xml:"NOTES"`
 	/* Extensions */
-	DisplayAmount string  `xml:"DISPLAY_AMOUNT"`
-	Inventory     string  `xml:"INVENTORY"`
-	DisplayTime   string  `xml:"DISPLAY_TIME"`
+	DisplayAmount  string  `xml:"DISPLAY_AMOUNT"`
+	Inventory      string  `xml:"INVENTORY"`
+	DisplayTime    string  `xml:"DISPLAY_TIME"`
 }
 
 type Water struct {

@@ -99,6 +99,7 @@ func sortIngredients(ingredients []*db.Ingredient) {
 			"fermentable": 0,
 			"hop": 1,
 			"yeast": 2,
+			"misc": 3,
 		}
 
 		// Smallest 'type' priority first, or fallback to

@@ -58,6 +58,13 @@
           <td>{{ .Amount }}{{ if .AmountIsWeight }}kg{{ else }}l{{ end }}</td>
         </tr>
 {{ end }}
+{{ range .Ingredients.Miscs }}
+        <tr>
+          <td><abbr title="Misc">M</abbr></td>
+          <td>{{ .Name }}</td>
+          <td>{{ .Amount }}{{ if .AmountIsWeight }}kg{{ else }}l{{ end }}</td>
+        </tr>
+{{ end }}
       </tbody>
     </table>
   </div>
@@ -82,6 +89,15 @@
               <td>{{ .Name }}</td>
               <td>{{ .Amount }}kg</td>
             </tr>
+{{ end }}
+
+{{ range .Brew.XML.Miscs }}
+{{ if eq .Use "Mash" }}
+            <tr>
+              <td>{{ .Name }}</td>
+              <td>{{ .Amount }}{{ if .AmountIsWeight }}kg{{ else }}l{{ end }}</td>
+            </tr>
+{{ end }}
 {{ end }}
           </tbody>
         </table>
@@ -139,6 +155,16 @@
         </tr>
 {{ end }}
 {{ end }}
+
+{{ range .Brew.XML.Miscs }}
+{{ if eq .Use "Boil" }}
+            <tr>
+              <td>{{ .Name }}</td>
+              <td>{{ .Amount }}{{ if .AmountIsWeight }}kg{{ else }}l{{ end }}</td>
+              <td>{{ .Time }}m</td>
+            </tr>
+{{ end }}
+{{ end }}
       </tbody>
     </table>
   </div>
@@ -149,26 +175,33 @@
   <div class="container">
     <div class="columns">
       <div class="column">
-        <h2 class="subtitle">Yeasts</h2>
+        <h2 class="subtitle">Fermentation steps</h2>
         <table class="table is-hoverable is-fullwidth">
           <thead>
             <tr>
-              <th>Name</th>
-              <th>Form</th>
-              <th>Amount</th>
+              <th></th>
+              <th>Age</th>
+              <th>Temp.</th>
             </tr>
           </thead>
           <tbody>
-{{ range .Brew.XML.Yeasts }}
             <tr>
-              <td>{{ .Name }}</td>
-              <td>{{ .Form }}</td>
-              <td>{{ .Amount }}{{ if .AmountIsWeight }}kg{{ else }}l{{ end }}</td>
+              <th>Primary</th>
+              <td>{{ .Brew.XML.PrimaryAge }}d</td>
+              <td>{{ .Brew.XML.PrimaryTemp }}°C</td>
             </tr>
-{{ end }}
+            <tr>
+              <th>Secondary</th>
+              <td>{{ .Brew.XML.SecondaryAge }}d</td>
+              <td>{{ .Brew.XML.SecondaryTemp }}°C</td>
+            </tr>
+            <tr>
+              <th>Tertiary</th>
+              <td>{{ .Brew.XML.TertiaryAge }}d</td>
+              <td>{{ .Brew.XML.TertiaryTemp }}°C</td>
+            </tr>
           </tbody>
         </table>
-
         <h2 class="subtitle">Parameters</h2>
         <form action="/brew/{{ .Brew.Id }}/save-fermentation" method="post">
           {{ .CSRF }}
@@ -207,31 +240,23 @@
         </form>
       </div>
       <div class="column">
-        <h2 class="subtitle">Fermentation steps</h2>
+        <h2 class="subtitle">Yeasts</h2>
         <table class="table is-hoverable is-fullwidth">
           <thead>
             <tr>
-              <th></th>
-              <th>Age</th>
-              <th>Temp.</th>
+              <th>Name</th>
+              <th>Form</th>
+              <th>Amount</th>
             </tr>
           </thead>
           <tbody>
+{{ range .Brew.XML.Yeasts }}
             <tr>
-              <th>Primary</th>
-              <td>{{ .Brew.XML.PrimaryAge }}d</td>
-              <td>{{ .Brew.XML.PrimaryTemp }}°C</td>
+              <td>{{ .Name }}</td>
+              <td>{{ .Form }}</td>
+              <td>{{ .Amount }}{{ if .AmountIsWeight }}kg{{ else }}l{{ end }}</td>
             </tr>
-            <tr>
-              <th>Secondary</th>
-              <td>{{ .Brew.XML.SecondaryAge }}d</td>
-              <td>{{ .Brew.XML.SecondaryTemp }}°C</td>
-            </tr>
-            <tr>
-              <th>Tertiary</th>
-              <td>{{ .Brew.XML.TertiaryAge }}d</td>
-              <td>{{ .Brew.XML.TertiaryTemp }}°C</td>
-            </tr>
+{{ end }}
           </tbody>
         </table>
 
@@ -258,6 +283,29 @@
           </tbody>
         </table>
 {{ end }}
+        <h2 class="subtitle">Ingredients</h2>
+        <table class="table is-hoverable is-fullwidth">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Use</th>
+              <th>Amount</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+{{ range .Brew.XML.Miscs }}
+{{ if or (eq .Use "Primary") (eq .Use "Secondary") }}
+            <tr>
+              <td>{{ .Name }}</td>
+              <td>{{ .Use }}</td>
+              <td>{{ .Amount }}{{ if .AmountIsWeight }}kg{{ else }}l{{ end }}</td>
+              <td>{{ .Time }}m</td>
+            </tr>
+{{ end }}
+{{ end }}
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
@@ -270,23 +318,68 @@
       <div class="column">
         <form action="/brew/{{ .Brew.Id }}/save-bottling" method="post">
           {{ .CSRF }}
-          <div class="field">
-            <label class="label" for="fg">FG</label>
-            <div class="control">
-              <input class="input" type="number" step="0.001" id="fg" name="fg"
-                value="{{ .Brew.XML.FG }}">
+          <div class="field is-horizontal">
+            <div class="field-body">
+              <div class="field">
+                <label class="label" for="age">Age (d)</label>
+                <div class="control">
+                  <input class="input" type="number" id="age" name="age"
+                    value="{{ .Brew.XML.Age }}" disabled>
+                </div>
+              </div>
+              <div class="field">
+                <label class="label" for="age">Age temp. (°C)</label>
+                <div class="control">
+                  <input class="input" type="number" id="age" name="age"
+                    value="{{ .Brew.XML.AgeTemp }}" disabled>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="field">
-            <div class="control">
-              <button class="button is-link" id="button">Save</button>
+          <div class="field is-horizontal">
+            <div class="field-body">
+              <div class="field">
+                <label class="label" for="fg">FG</label>
+                <div class="control">
+                  <input class="input" type="number" step="0.001" id="fg" name="fg"
+                    value="{{ .Brew.XML.FG }}">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="field is-horizontal">
+            <div class="field-body">
+              <div class="field">
+                <div class="control">
+                  <button class="button is-link" id="button">Save</button>
+                </div>
+              </div>
             </div>
           </div>
         </form>
       </div>
       <div class="column">
-        <strong>Age in bottle</strong>:
-        {{ .Brew.XML.Age }}d at {{ .Brew.XML.AgeTemp }}°C.
+        <h2 class="subtitle">Ingredients</h2>
+        <table class="table is-hoverable is-fullwidth">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Amount</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+{{ range .Brew.XML.Miscs }}
+{{ if eq .Use "Bottling" }}
+            <tr>
+              <td>{{ .Name }}</td>
+              <td>{{ .Amount }}{{ if .AmountIsWeight }}kg{{ else }}l{{ end }}</td>
+              <td>{{ .Time }}m</td>
+            </tr>
+{{ end }}
+{{ end }}
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

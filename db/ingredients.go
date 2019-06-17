@@ -77,6 +77,10 @@ func (db *DB) importIngredientXML(i *Ingredient) error {
 		var y beerxml.Yeast
 		err = db.importXML(i.File, &y)
 		i.XML = &y
+	case "misc":
+		var m beerxml.Misc
+		err = db.importXML(i.File, &m)
+		i.XML = &m
 	default:
 		return fmt.Errorf("Unknown type.")
 	}

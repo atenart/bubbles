@@ -88,6 +88,7 @@ func (s *Server) recipe(w http.ResponseWriter, r *http.Request, user *db.User) {
 	var fermentables []*beerxml.Fermentable
 	var hops []*beerxml.Hop
 	var yeasts []*beerxml.Yeast
+	var miscs []*beerxml.Misc
 	for _, i := range ingredients {
 		switch xml := i.XML.(type) {
 		case *beerxml.Fermentable:
@@ -96,6 +97,8 @@ func (s *Server) recipe(w http.ResponseWriter, r *http.Request, user *db.User) {
 			hops = append(hops, xml)
 		case *beerxml.Yeast:
 			yeasts = append(yeasts, xml)
+		case *beerxml.Misc:
+			miscs = append(miscs, xml)
 		}
 	}
 
@@ -109,6 +112,7 @@ func (s *Server) recipe(w http.ResponseWriter, r *http.Request, user *db.User) {
 		Fermentables []*beerxml.Fermentable
 		Hops         []*beerxml.Hop
 		Yeasts       []*beerxml.Yeast
+		Miscs        []*beerxml.Misc
 	}{
 		csrf.TemplateField(r),
 		fmt.Sprintf("Bubbles - recipe/%s", recipe.Name),
@@ -119,6 +123,7 @@ func (s *Server) recipe(w http.ResponseWriter, r *http.Request, user *db.User) {
 		fermentables,
 		hops,
 		yeasts,
+		miscs,
 	})
 }
 
@@ -357,6 +362,17 @@ func (s *Server) saveRecipe(w http.ResponseWriter, r *http.Request, user *db.Use
 			http.Error(w, err.Error(), 500)
 			return
 		}
+	case "add-misc":
+		var misc beerxml.Misc
+		if err := formToMisc(r, &misc); err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+
+		if err := beerxml.InsertToRecipe(recipe.XML, &misc); err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
 	case "add-mash-step":
 		step, err := formToMashStep(r)
 		if err != nil {
@@ -416,6 +432,22 @@ func (s *Server) saveRecipe(w http.ResponseWriter, r *http.Request, user *db.Use
 			http.Error(w, err.Error(), 500)
 			return
 		}
+	case "edit-misc":
+		var misc beerxml.Misc
+		if err := formToMisc(r, &misc); err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+
+		if err := beerxml.RemoveFromRecipe(recipe.XML, &beerxml.Misc{}, item); err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+
+		if err := beerxml.InsertToRecipe(recipe.XML, &misc); err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
 	case "edit-mash-step":
 		mashStep, err := formToMashStep(r)
 		if err != nil {
@@ -444,6 +476,11 @@ func (s *Server) saveRecipe(w http.ResponseWriter, r *http.Request, user *db.Use
 		}
 	case "del-yeast":
 		if err := beerxml.RemoveFromRecipe(recipe.XML, &beerxml.Yeast{}, item); err != nil {
+			http.Error(w, err.Error(), 500)
+			return
+		}
+	case "del-misc":
+		if err := beerxml.RemoveFromRecipe(recipe.XML, &beerxml.Misc{}, item); err != nil {
 			http.Error(w, err.Error(), 500)
 			return
 		}
@@ -574,6 +611,23 @@ func formToYeast(r *http.Request, yeast *beerxml.Yeast) error {
 
 	// Sanity checks
 	if yeast.Name == "" {
+		return fmt.Errorf("'Name' is required.")
+	}
+
+	return nil
+}
+
+// Convert elements POSTed from a form into a beerxml.Misc.
+func formToMisc(r *http.Request, misc *beerxml.Misc) error {
+	misc.Name = r.FormValue("name")
+	misc.Type = r.FormValue("type")
+	misc.Use = r.FormValue("use")
+	misc.Time, _ = strconv.ParseFloat(r.FormValue("time"), 64)
+	misc.Amount, _ = strconv.ParseFloat(r.FormValue("amount"), 64)
+	misc.AmountIsWeight = r.FormValue("unit") == "kilogram"
+
+	// Sanity checks
+	if misc.Name == "" {
 		return fmt.Errorf("'Name' is required.")
 	}
 
