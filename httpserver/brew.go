@@ -46,10 +46,12 @@ func (s *Server) brews(w http.ResponseWriter, r *http.Request, user *db.User) {
 	}
 
 	s.executeTemplate(w, user, "brews.html", struct{
+		CSRF      template.HTML
 		Title     string
 		Brews     []*db.Brew
 		StepNames []string
 	}{
+		csrf.TemplateField(r),
 		"Bubbles - brews",
 		brews,
 		names,
@@ -166,6 +168,28 @@ func (s *Server) getBrew(id, uid int64) (*db.Brew, error) {
 	}
 
 	return brew, nil
+}
+
+// Delete a brew.
+func (s *Server) deleteBrew(w http.ResponseWriter, r *http.Request, user *db.User) {
+	id, err := strconv.ParseInt(mux.Vars(r)["Id"], 10, 64)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	brew, err := s.getBrew(id, user.Id)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	if err := s.db.DeleteBrew(brew); err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+
+	http.Redirect(w, r, "/brews", 302)
 }
 
 // Save information of a brew.

@@ -12,6 +12,7 @@
           <th>{{ L "Recipe" }}</th>
           <th>{{ L "Start Date" }}</th>
           <th>{{ L "Current step" }}</th>
+          <th class="has-text-right-desktop">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -20,6 +21,11 @@
           <td><a href="/brew/{{ $v.Id }}">{{ $v.XML.Name }}</a></td>
           <td>{{ $v.XML.Date }}</td>
           <td>{{ index $.StepNames $k }}</td>
+          <td class="has-text-right-desktop">
+            <a class="button is-small" title="Delete" onclick="showDelete('{{ $v.Id }}');">
+              <span class="icon is-small"><i class="fas fa-trash"></i></span>
+            </a>
+          </td>
         </tr>
 {{ end }}
       </tbody>
@@ -32,5 +38,35 @@
 {{ end }}
   </div>
 </section>
+
+<div class="modal" id="modal-delete">
+  <div class="modal-background"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Delete brew?</p>
+      <button class="delete" aria-label="close" onclick="hideModal('delete');">
+      </button>
+    </header>
+    <section class="modal-card-body">
+      <p>
+        All the data associated to the brew will be deleted.
+      </p><br />
+      <form action="" method="post">
+        {{ .CSRF }}
+        <button class="button is-danger">Yes, delete</button>
+        <a class="button is-light" onclick="hideModal('delete');">
+          No, keep
+        </a>
+      </form>
+    </section>
+  </div>
+</div>
+
+<script>
+  function showDelete(id) {
+    $(`#modal-delete form`).attr("action", `/brew/${id}/delete`);
+    showModal("delete");
+  }
+</script>
 
 {{ template "foot.html" }}

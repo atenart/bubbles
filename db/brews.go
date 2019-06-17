@@ -98,3 +98,21 @@ VALUES (?, ?, ?, ?, ?)`, b.Id, b.UserId, b.RecipeId, b.Step, b.File)
 
 	return beerxml.ExportFile(b.XML, path.Join(db.rootdir, b.File))
 }
+
+// Delete a brew.
+func (db *DB) DeleteBrew(b *Brew) error {
+	// First, remove the db entry.
+	if _, err := db.Exec("DELETE FROM brews WHERE id == ?", b.Id); err != nil {
+		return err
+	}
+
+	// Then, remove the recipe XML file.
+	if err := os.Remove(path.Join(db.rootdir, b.File)); err != nil {
+		return err
+	}
+
+	// Finally try removing its directory (if empty).
+	os.Remove(path.Dir(path.Join(db.rootdir, b.File)))
+
+	return nil
+}

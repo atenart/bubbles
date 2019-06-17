@@ -114,6 +114,7 @@ func Serve(bind, url string, db *db.DB, sendmail *sendmail.Sendmail, i18n *i18n.
 	s.handleFunc("/brews", s.brews)
 	s.handleFunc("/brew/new/{Id:[0-9]+}", s.newBrew)
 	s.handleFunc("/brew/{Id:[0-9]+}", s.brew)
+	s.handleFunc("/brew/{Id:[0-9]+}/delete", s.deleteBrew).Methods("POST")
 	s.handleFunc("/brew/{Id:[0-9]+}/prev", s.brewPrevStep).Methods("POST")
 	s.handleFunc("/brew/{Id:[0-9]+}/next", s.brewNextStep).Methods("POST")
 	s.handleFunc("/brew/{Id:[0-9]+}/save-{Action:[a-z-]+}", s.brewSave).Methods("POST")
