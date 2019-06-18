@@ -36,7 +36,7 @@
               </div>
               <div class="field">
                 <div class="select is-fullwidth">
-                  <select name="public">
+                  <select name="public" disabled>
                     <option value="false" {{ if not .Recipe.Public }}selected{{ end }}>Private</option>
                     <option value="true" {{ if .Recipe.Public }}selected{{ end }}>Public</option>
                   </select>
