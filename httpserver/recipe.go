@@ -497,6 +497,7 @@ func (s *Server) saveRecipe(w http.ResponseWriter, r *http.Request, user *db.Use
 	sort(recipe.XML.Fermentables)
 	sort(recipe.XML.Hops)
 	sort(recipe.XML.Yeasts)
+	sort(recipe.XML.Miscs)
 	sort(recipe.XML.Mash.MashSteps)
 
 	// Update recipe.

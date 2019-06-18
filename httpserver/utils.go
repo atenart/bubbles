@@ -84,6 +84,33 @@ func sortYeasts(yeasts []beerxml.Yeast) {
 	})
 }
 
+// Sort a slice of beerxml.Misc.
+func sortMisc(miscs []beerxml.Misc) {
+	s.Slice(miscs, func(i, j int) bool {
+		uses := map[string]int{
+			"Mash": 0,
+			"Boil": 1,
+			"Primary": 2,
+			"Secondary": 3,
+			"Bottling": 4,
+		}
+
+		// Smallest 'use' priority first, or
+		// longest 'time' first, or
+		// largest 'amount' first, or
+		// 'name' in alphabetical order.
+		if miscs[i].Use != miscs[j].Use {
+			return uses[miscs[i].Use] < uses[miscs[j].Use]
+		} else if miscs[i].Time != miscs[j].Time {
+			return miscs[i].Time > miscs[j].Time
+		} else if miscs[i].Amount != miscs[j].Amount {
+			return miscs[i].Amount > miscs[j].Amount
+		}
+
+		return miscs[i].Name < miscs[j].Name
+	})
+}
+
 // Sort a slice of beerxml.MashStep.
 func sortMashSteps(steps []beerxml.MashStep) {
 	s.Slice(steps, func(i, j int) bool {
@@ -120,6 +147,8 @@ func sort(slice interface{}) {
 		sortHops(elmt)
 	case []beerxml.Yeast:
 		sortYeasts(elmt)
+	case []beerxml.Misc:
+		sortMisc(elmt)
 	case []beerxml.MashStep:
 		sortMashSteps(elmt)
 	case []*db.Ingredient:
