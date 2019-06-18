@@ -206,7 +206,7 @@
             <td>{{ $v.Name }}</td>
             <td>{{ $v.Type }}</td>
             <td>{{ $v.Amount }}{{ if $v.AmountIsWeight }}kg{{ else }}l{{ end }}</td>
-            <td>{{ $v.Use }} - {{ $v.Time }}m</td>
+            <td>{{ $v.Use }}</td>
             <td>-</td>
             <td class="has-text-right-desktop">
               <a class="button is-small" title="Edit" onclick="editMisc('/recipe/{{ $.Recipe.Id }}' ,'#misc-{{ $k }}')">

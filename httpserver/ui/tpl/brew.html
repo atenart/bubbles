@@ -260,12 +260,14 @@
           </tbody>
         </table>
 
-{{ if .DryHop }}
-        <h2 class="subtitle">Dry hop</h2>
+{{ if .Extra }}
+        <h2 class="subtitle">Extra ingredients</h2>
         <table class="table is-hoverable is-fullwidth">
           <thead>
             <tr>
+              <th></th>
               <th>Name</th>
+              <th>Use</th>
               <th>Amount</th>
               <th>Time</th>
             </tr>
@@ -274,29 +276,18 @@
 {{ range .Brew.XML.Hops }}
 {{ if eq .Use "Dry hop" }}
             <tr>
+              <td><abbr title="Hop">H</abbr></td>
               <td>{{ .Name }}</td>
+              <td>Dry hop</td>
               <td>{{ .Amount }}kg</td>
               <td>{{ .Time }}m</td>
             </tr>
 {{ end }}
 {{ end }}
-          </tbody>
-        </table>
-{{ end }}
-        <h2 class="subtitle">Ingredients</h2>
-        <table class="table is-hoverable is-fullwidth">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Use</th>
-              <th>Amount</th>
-              <th>Time</th>
-            </tr>
-          </thead>
-          <tbody>
 {{ range .Brew.XML.Miscs }}
 {{ if or (eq .Use "Primary") (eq .Use "Secondary") }}
             <tr>
+              <td><abbr title="Misc">M</abbr></td>
               <td>{{ .Name }}</td>
               <td>{{ .Use }}</td>
               <td>{{ .Amount }}{{ if .AmountIsWeight }}kg{{ else }}l{{ end }}</td>
@@ -306,6 +297,7 @@
 {{ end }}
           </tbody>
         </table>
+{{ end }}
       </div>
     </div>
   </div>
@@ -401,13 +393,6 @@
           </div>
 
           <div class="field">
-            <label class="label" for="notes">Notes</label>
-            <div class="control">
-              <textarea class="textarea" id="notes" name="notes">{{ .Brew.XML.Notes }}</textarea>
-            </div>
-          </div>
-
-          <div class="field">
             <div class="control">
               <button class="button is-link" id="button">Save</button>
             </div>
@@ -426,6 +411,26 @@
   </div>
 
 {{ end }}
+
+</section>
+
+<section class="section">
+  <div class="container">
+    <form action="/brew/{{ .Brew.Id }}/save-notes" method="post">
+      {{ .CSRF }}
+      <div class="field">
+        <label class="label" for="notes">Notes</label>
+        <div class="control">
+          <textarea class="textarea" id="notes" name="notes">{{ .Brew.XML.Notes }}</textarea>
+        </div>
+      </div>
+      <div class="field">
+        <div class="control">
+          <button class="button is-link" id="button">Save</button>
+        </div>
+      </div>
+    </form>
+  </div>
 
 </section>
 

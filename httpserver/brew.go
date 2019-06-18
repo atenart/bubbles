@@ -82,10 +82,16 @@ func (s *Server) brew(w http.ResponseWriter, r *http.Request, user *db.User) {
 		ingredients = addUpIngredients(brew.XML)
 	}
 
-	dryHop := false
+	extra := false
 	for _, h := range brew.XML.Hops {
 		if h.Use == "Dry hop" {
-			dryHop = true
+			extra = true
+			break
+		}
+	}
+	for _, m := range brew.XML.Miscs {
+		if m.Use == "Primary" || m.Use == "Secondary" {
+			extra = true
 			break
 		}
 	}
@@ -100,7 +106,7 @@ func (s *Server) brew(w http.ResponseWriter, r *http.Request, user *db.User) {
 		Brew        *db.Brew
 		Calc        *Calculation
 		Ingredients *beerxml.BeerXML
-		DryHop      bool
+		Extra       bool
 	}{
 		csrf.TemplateField(r),
 		fmt.Sprintf("Bubbles - brew/%s %s", brew.XML.Name, brew.XML.Date),
@@ -110,7 +116,7 @@ func (s *Server) brew(w http.ResponseWriter, r *http.Request, user *db.User) {
 		brew,
 		calculations(brew.XML),
 		ingredients,
-		dryHop,
+		extra,
 	})
 }
 
@@ -232,8 +238,9 @@ func (s *Server) brewSave(w http.ResponseWriter, r *http.Request, user *db.User)
 		// Update calc params.
 		brew.XML.ABV = math.Round(brew.XML.CalcRealABV() * 10) / 10
 	case "done":
-		brew.XML.Notes = r.FormValue("notes")
 		brew.XML.TasteNotes = r.FormValue("taste-notes")
+	case "notes":
+		brew.XML.Notes = r.FormValue("notes")
 	default:
 		http.Error(w, "Unknown action.", 500)
 		return
