@@ -58,7 +58,7 @@ func (s *Server) saveAccount(w http.ResponseWriter, r *http.Request, user *db.Us
 
 	// Password udate
 	if currentPassword != "" && newPassword != "" && confirmPassword != "" {
-		currentHash, err := s.db.HashPassword(currentPassword)
+		currentHash, err := s.db.HashPassword(user.Email, currentPassword)
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return
@@ -74,7 +74,7 @@ func (s *Server) saveAccount(w http.ResponseWriter, r *http.Request, user *db.Us
 			return
 		}
 
-		user.Password, err = s.db.HashPassword(newPassword)
+		user.Password, err = s.db.HashPassword(user.Email, newPassword)
 		if err != nil {
 			http.Error(w, err.Error(), 500)
 			return

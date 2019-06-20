@@ -16,6 +16,7 @@
 package db
 
 import (
+	"bytes"
 	"encoding/base64"
 	"golang.org/x/crypto/scrypt"
 
@@ -24,12 +25,17 @@ import (
 
 // Hashes a plaintext password.
 func (db *DB) HashPassword(user, password string) (string, error) {
+	// Use the username as part of the salt.
+	var salt bytes.Buffer
+	salt.Write([]byte(user))
+	salt.Write(db.salt)
+
 	// The recommended parameters for interactive logins as of 2017 are
 	// N=32768, r=8 and p=1. The parameters N, r, and p should be increased
 	// as memory latency and CPU parallelism increases; consider setting N
 	// to the highest power of 2 you can derive within 100 milliseconds.
 	// https://godoc.org/golang.org/x/crypto/scrypt#Key
-	dk, err := scrypt.Key([]byte(password), db.salt, 1<<15, 8, 1, 32)
+	dk, err := scrypt.Key([]byte(password), salt.Bytes(), 1<<15, 8, 1, 32)
 	if err != nil {
 		return "", err
 	}

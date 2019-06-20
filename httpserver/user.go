@@ -69,7 +69,7 @@ func (s *Server) login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Generate an hash out of the provided plaintext password.
-	hash, err := s.db.HashPassword(password)
+	hash, err := s.db.HashPassword(user.Email, password)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
@@ -121,7 +121,7 @@ func (s *Server) signUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Compute the hash password out of the provided plaintext one.
-	hash, err := s.db.HashPassword(password)
+	hash, err := s.db.HashPassword(email, password)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
