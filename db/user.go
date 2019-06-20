@@ -23,8 +23,12 @@ import (
 )
 
 // Hashes a plaintext password.
-func (db *DB) HashPassword(password string) (string, error) {
-	// TODO: check & document.
+func (db *DB) HashPassword(user, password string) (string, error) {
+	// The recommended parameters for interactive logins as of 2017 are
+	// N=32768, r=8 and p=1. The parameters N, r, and p should be increased
+	// as memory latency and CPU parallelism increases; consider setting N
+	// to the highest power of 2 you can derive within 100 milliseconds.
+	// https://godoc.org/golang.org/x/crypto/scrypt#Key
 	dk, err := scrypt.Key([]byte(password), db.salt, 1<<15, 8, 1, 32)
 	if err != nil {
 		return "", err
