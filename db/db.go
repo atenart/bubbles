@@ -105,7 +105,7 @@ func Open(rootdir string) (*DB, error) {
 	}
 
 	d := &DB{ db, &xml.Styles, rootdir, nil }
-	d.salt = d.LoadKey("salt.db", 64)
+	d.salt = d.LoadKey("salt.db", 32)
 
 	return d, nil
 }
