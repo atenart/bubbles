@@ -109,9 +109,19 @@ func (db *DB) DeleteUser(u *User) error {
 	if err != nil {
 		return err
 	}
-
 	for _, r := range recipes {
 		if err := db.DeleteRecipe(r); err != nil {
+			return err
+		}
+	}
+
+	// Delete all the ingredients associated to the user.
+	inventory, err := db.GetUserIngredients(u.Id)
+	if err != nil {
+		return err
+	}
+	for _, i := range inventory {
+		if err := db.DeleteIngredient(i); err != nil {
 			return err
 		}
 	}
