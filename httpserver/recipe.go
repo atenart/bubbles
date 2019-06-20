@@ -511,14 +511,9 @@ func (s *Server) saveRecipe(w http.ResponseWriter, r *http.Request, user *db.Use
 
 // Convert elements POSTed from a form into a *db.Recipe.
 func formToRecipe(r *http.Request, recipe *db.Recipe) error {
-	var err error
-
 	// First convert elements going directly into the db.Recipe.
 	recipe.Name = r.FormValue("name")
 	recipe.XML.Name = recipe.Name
-	if recipe.Public, err = strconv.ParseBool(r.FormValue("public")); err != nil {
-		return err
-	}
 
 	// Then take care of the BeerXML part.
 
