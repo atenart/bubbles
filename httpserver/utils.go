@@ -139,6 +139,7 @@ func sortIngredients(ingredients []*db.Ingredient) {
 	})
 }
 
+// Automagically sort slices based on their type.
 func sort(slice interface{}) {
 	switch elmt := slice.(type) {
 	case []beerxml.Fermentable:
