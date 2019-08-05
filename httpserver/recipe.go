@@ -500,6 +500,13 @@ func (s *Server) saveRecipe(w http.ResponseWriter, r *http.Request, user *db.Use
 	sort(recipe.XML.Miscs)
 	sort(recipe.XML.Mash.MashSteps)
 
+	// Compute estimations.
+	recipe.XML.EstOG = math.Round(recipe.XML.CalcOG() * 1000) / 1000
+	recipe.XML.EstFG = math.Round(recipe.XML.CalcFG() * 1000) / 1000
+	recipe.XML.EstABV = math.Round(recipe.XML.CalcABV() * 10) / 10
+	recipe.XML.IBU = math.Round(recipe.XML.CalcIBU() * 10) / 10
+	recipe.XML.EstColor = math.Round(recipe.XML.CalcColor() *  100) / 100
+
 	// Update recipe.
 	if err = s.db.UpdateRecipe(recipe); err != nil {
 		http.Error(w, err.Error(), 500)
@@ -541,14 +548,6 @@ func formToRecipe(r *http.Request, recipe *db.Recipe) error {
 	if recipe.Name == "" {
 		return fmt.Errorf("'Name' is required.")
 	}
-
-	// Compute estimations.
-
-	recipe.XML.EstOG = math.Round(recipe.XML.CalcOG() * 1000) / 1000
-	recipe.XML.EstFG = math.Round(recipe.XML.CalcFG() * 1000) / 1000
-	recipe.XML.EstABV = math.Round(recipe.XML.CalcABV() * 10) / 10
-	recipe.XML.IBU = math.Round(recipe.XML.CalcIBU() * 10) / 10
-	recipe.XML.EstColor = math.Round(recipe.XML.CalcColor() *  100) / 100
 
 	return nil
 }

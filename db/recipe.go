@@ -41,7 +41,7 @@ func (db *DB) GetRecipe(id int64) (*Recipe, error) {
 
 // Retrieves all recipes for a given user.
 func (db *DB) GetUserRecipes(uid int64) ([]*Recipe, error) {
-	row, err := db.Query("SELECT * FROM recipes WHERE user_id == ?", uid)
+	row, err := db.Query("SELECT * FROM recipes WHERE user_id == ? ORDER BY id DESC", uid)
 	if err != nil {
 		return nil, err
 	}

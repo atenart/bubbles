@@ -38,7 +38,6 @@ func (s *Server) brews(w http.ResponseWriter, r *http.Request, user *db.User) {
 		return
 	}
 
-	// Retrieve step names (FIXME).
 	var names []string
 	for _, b := range brews {
 		n, _ := db.StepName(b.Step)
